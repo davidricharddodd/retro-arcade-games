@@ -1,0 +1,235 @@
+### /Users/daviddodd/retro-arcade.html
+```html
+1: <!DOCTYPE html>
+2: <html lang="en">
+3: <head>
+4:     <meta charset="UTF-8">
+5:     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+6:     <title>Retro Arcade Games</title>
+7:     <style>
+8:         * {
+9:             margin: 0;
+10:             padding: 0;
+11:             box-sizing: border-box;
+12:         }
+13: 
+14:         body {
+15:             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+16:             min-height: 100vh;
+17:             display: flex;
+18:             justify-content: center;
+19:             align-items: center;
+20:             font-family: 'Courier New', monospace;
+21:             padding: 20px;
+22:         }
+23: 
+24:         .arcade-container {
+25:             text-align: center;
+26:             max-width: 1200px;
+27:             width: 100%;
+28:         }
+29: 
+30:         h1 {
+31:             font-size: 4em;
+32:             color: #ff0;
+33:             text-shadow: 
+34:                 0 0 10px #ff0,
+35:                 0 0 20px #ff0,
+36:                 0 0 30px #f0f,
+37:                 0 0 40px #f0f;
+38:             margin-bottom: 20px;
+39:             animation: glow 2s ease-in-out infinite alternate;
+40:         }
+41: 
+42:         @keyframes glow {
+43:             from {
+44:                 text-shadow: 
+45:                     0 0 10px #ff0,
+46:                     0 0 20px #ff0,
+47:                     0 0 30px #f0f,
+48:                     0 0 40px #f0f;
+49:             }
+50:             to {
+51:                 text-shadow: 
+52:                     0 0 20px #ff0,
+53:                     0 0 30px #ff0,
+54:                     0 0 40px #f0f,
+55:                     0 0 50px #f0f,
+56:                     0 0 60px #f0f;
+57:             }
+58:         }
+59: 
+60:         .subtitle {
+61:             font-size: 1.5em;
+62:             color: #0ff;
+63:             margin-bottom: 50px;
+64:             text-shadow: 0 0 10px #0ff;
+65:         }
+66: 
+67:         .games-grid {
+68:             display: grid;
+69:             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+70:             gap: 30px;
+71:             margin-bottom: 50px;
+72:         }
+73: 
+74:         .game-card {
+75:             background: rgba(0, 0, 0, 0.8);
+76:             border: 3px solid #0ff;
+77:             border-radius: 15px;
+78:             padding: 30px;
+79:             transition: all 0.3s ease;
+80:             cursor: pointer;
+81:             box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+82:         }
+83: 
+84:         .game-card:hover {
+85:             transform: translateY(-10px);
+86:             border-color: #ff0;
+87:             box-shadow: 0 0 40px rgba(255, 255, 0, 0.6);
+88:         }
+89: 
+90:         .game-icon {
+91:             font-size: 5em;
+92:             margin-bottom: 20px;
+93:             display: block;
+94:         }
+95: 
+96:         .game-title {
+97:             font-size: 2em;
+98:             color: #ff0;
+99:             margin-bottom: 10px;
+100:             text-shadow: 0 0 10px #ff0;
+101:         }
+102: 
+103:         .game-description {
+104:             color: #fff;
+105:             font-size: 1em;
+106:             margin-bottom: 20px;
+107:             line-height: 1.5;
+108:         }
+109: 
+110:         .play-btn {
+111:             background: linear-gradient(135deg, #0ff 0%, #0af 100%);
+112:             color: #000;
+113:             border: none;
+114:             padding: 15px 40px;
+115:             font-size: 1.2em;
+116:             font-family: 'Courier New', monospace;
+117:             font-weight: bold;
+118:             cursor: pointer;
+119:             border-radius: 30px;
+120:             box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+121:             transition: all 0.3s ease;
+122:             text-decoration: none;
+123:             display: inline-block;
+124:         }
+125: 
+126:         .play-btn:hover {
+127:             background: linear-gradient(135deg, #ff0 0%, #fa0 100%);
+128:             box-shadow: 0 0 30px rgba(255, 255, 0, 0.8);
+129:             transform: scale(1.1);
+130:         }
+131: 
+132:         .features {
+133:             background: rgba(0, 0, 0, 0.7);
+134:             border: 2px solid #f0f;
+135:             border-radius: 10px;
+136:             padding: 20px;
+137:             margin-top: 30px;
+138:             color: #fff;
+139:         }
+140: 
+141:         .features h3 {
+142:             color: #f0f;
+143:             font-size: 1.5em;
+144:             margin-bottom: 15px;
+145:             text-shadow: 0 0 10px #f0f;
+146:         }
+147: 
+148:         .features ul {
+149:             list-style: none;
+150:             padding: 0;
+151:         }
+152: 
+153:         .features li {
+154:             margin: 10px 0;
+155:             font-size: 1.1em;
+156:         }
+157: 
+158:         .features li::before {
+159:             content: "👾 ";
+160:         }
+161: 
+162:         @media (max-width: 768px) {
+163:             h1 {
+164:                 font-size: 2.5em;
+165:             }
+166:             
+167:             .games-grid {
+168:                 grid-template-columns: 1fr;
+169:             }
+170:         }
+171:     </style>
+172: </head>
+173: <body>
+174:     <div class="arcade-container">
+175:         <h1>🕹️ RETRO ARCADE 🕹️</h1>
+176:         <p class="subtitle">Classic Games Collection</p>
+177: 
+178:         <div class="games-grid">
+179:             <div class="game-card" onclick="window.location.href='connect4.html'">
+180:                 <span class="game-icon">🔴🟡</span>
+181:                 <h2 class="game-title">CONNECT 4</h2>
+182:                 <p class="game-description">
+183:                     Classic strategy game with AI opponent!
+184:                     <br><br>
+185:                     ✓ 3 Difficulty Levels<br>
+186:                     ✓ Player vs Player<br>
+187:                     ✓ Sound Effects
+188:                 </p>
+189:                 <a href="connect4.html" class="play-btn">PLAY NOW</a>
+190:             </div>
+191: 
+192:             <div class="game-card" onclick="window.location.href='space-invaders.html'">
+193:                 <span class="game-icon">🚀👾</span>
+194:                 <h2 class="game-title">SPACE INVADERS</h2>
+195:                 <p class="game-description">
+196:                     Defend Earth from alien invasion!
+197:                     <br><br>
+198:                     ✓ Multiple Levels<br>
+199:                     ✓ High Score Tracking<br>
+200:                     ✓ Retro Sound FX
+201:                 </p>
+202:                 <a href="space-invaders.html" class="play-btn">PLAY NOW</a>
+203:             </div>
+204: 
+205:             <div class="game-card" onclick="window.location.href='pacman.html'">
+206:                 <span class="game-icon">🟡👻</span>
+207:                 <h2 class="game-title">PAC-MAN</h2>
+208:                 <p class="game-description">
+209:                     Eat dots and avoid ghosts!
+210:                     <br><br>
+211:                     ✓ Classic Maze<br>
+212:                     ✓ Power Pellets<br>
+213:                     ✓ Progressive Difficulty
+214:                 </p>
+215:                 <a href="pacman.html" class="play-btn">PLAY NOW</a>
+216:             </div>
+217:         </div>
+218: 
+219:         <div class="features">
+220:             <h3>✨ Features</h3>
+221:             <ul>
+222:                 <li>100% Browser-Based - No Downloads!</li>
+223:                 <li>Retro Graphics & Sound Effects</li>
+224:                 <li>Keyboard Controls</li>
+225:                 <li>Responsive Design</li>
+226:                 <li>High Score Tracking</li>
+227:                 <li>Pause & Resume</li>
+228:             </ul>
+229:         </div>
+230:     </div>
+231: </body>
+232: </html>
+```

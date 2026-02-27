@@ -1,0 +1,645 @@
+### /Users/daviddodd/space-invaders.html
+```html
+1: <!DOCTYPE html>
+2: <html lang="en">
+3: <head>
+4:     <meta charset="UTF-8">
+5:     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+6:     <title>Space Invaders - Retro Arcade</title>
+7:     <style>
+8:         * {
+9:             margin: 0;
+10:             padding: 0;
+11:             box-sizing: border-box;
+12:         }
+13: 
+14:         body {
+15:             background: #000;
+16:             display: flex;
+17:             justify-content: center;
+18:             align-items: center;
+19:             min-height: 100vh;
+20:             font-family: 'Courier New', monospace;
+21:             overflow: hidden;
+22:         }
+23: 
+24:         .game-container {
+25:             text-align: center;
+26:             background: #0a0a0a;
+27:             padding: 20px;
+28:             border-radius: 10px;
+29:             box-shadow: 0 0 50px rgba(0, 255, 0, 0.3);
+30:         }
+31: 
+32:         h1 {
+33:             color: #0f0;
+34:             font-size: 2.5em;
+35:             margin-bottom: 10px;
+36:             text-shadow: 0 0 10px #0f0;
+37:             font-weight: bold;
+38:         }
+39: 
+40:         .game-info {
+41:             display: flex;
+42:             justify-content: space-between;
+43:             color: #0f0;
+44:             font-size: 1.2em;
+45:             margin-bottom: 10px;
+46:             padding: 10px;
+47:             background: #111;
+48:             border-radius: 5px;
+49:         }
+50: 
+51:         .info-item {
+52:             padding: 0 20px;
+53:         }
+54: 
+55:         canvas {
+56:             border: 3px solid #0f0;
+57:             background: #000;
+58:             display: block;
+59:             margin: 0 auto;
+60:             box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+61:         }
+62: 
+63:         .controls {
+64:             margin-top: 20px;
+65:             color: #0f0;
+66:             font-size: 0.9em;
+67:         }
+68: 
+69:         .controls p {
+70:             margin: 5px 0;
+71:         }
+72: 
+73:         button {
+74:             background: #0f0;
+75:             color: #000;
+76:             border: none;
+77:             padding: 10px 30px;
+78:             font-size: 1.2em;
+79:             font-family: 'Courier New', monospace;
+80:             font-weight: bold;
+81:             cursor: pointer;
+82:             margin: 10px 5px;
+83:             border-radius: 5px;
+84:             box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+85:             transition: all 0.3s;
+86:         }
+87: 
+88:         button:hover {
+89:             background: #0d0;
+90:             box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+91:             transform: scale(1.05);
+92:         }
+93: 
+94:         button:active {
+95:             transform: scale(0.95);
+96:         }
+97: 
+98:         .game-over-screen, .start-screen {
+99:             position: absolute;
+100:             top: 50%;
+101:             left: 50%;
+102:             transform: translate(-50%, -50%);
+103:             background: rgba(0, 0, 0, 0.95);
+104:             padding: 40px;
+105:             border-radius: 10px;
+106:             border: 3px solid #0f0;
+107:             text-align: center;
+108:             display: none;
+109:             z-index: 10;
+110:         }
+111: 
+112:         .game-over-screen.visible, .start-screen.visible {
+113:             display: block;
+114:         }
+115: 
+116:         .game-over-screen h2, .start-screen h2 {
+117:             color: #f00;
+118:             font-size: 3em;
+119:             margin-bottom: 20px;
+120:             text-shadow: 0 0 20px #f00;
+121:         }
+122: 
+123:         .start-screen h2 {
+124:             color: #0f0;
+125:             text-shadow: 0 0 20px #0f0;
+126:         }
+127: 
+128:         .final-score {
+129:             color: #0f0;
+130:             font-size: 1.5em;
+131:             margin: 20px 0;
+132:         }
+133: 
+134:         .sound-toggle {
+135:             color: #0f0;
+136:             margin-top: 10px;
+137:         }
+138: 
+139:         @keyframes blink {
+140:             0%, 50% { opacity: 1; }
+141:             51%, 100% { opacity: 0; }
+142:         }
+143: 
+144:         .blink {
+145:             animation: blink 1s infinite;
+146:         }
+147:     </style>
+148: </head>
+149: <body>
+150:     <div class="game-container">
+151:         <h1>🚀 SPACE INVADERS 👾</h1>
+152:         <div class="game-info">
+153:             <div class="info-item">SCORE: <span id="score">0</span></div>
+154:             <div class="info-item">LIVES: <span id="lives">3</span></div>
+155:             <div class="info-item">LEVEL: <span id="level">1</span></div>
+156:             <div class="info-item">HIGH: <span id="highScore">0</span></div>
+157:         </div>
+158:         <canvas id="gameCanvas" width="800" height="600"></canvas>
+159:         <div class="controls">
+160:             <p>← → ARROW KEYS: Move | SPACE: Shoot</p>
+161:             <button id="soundBtn">🔊 SOUND ON</button>
+162:             <button id="pauseBtn">⏸ PAUSE</button>
+163:         </div>
+164: 
+165:         <div class="start-screen visible" id="startScreen">
+166:             <h2>SPACE INVADERS</h2>
+167:             <p style="color: #0f0; font-size: 1.2em; margin: 20px 0;">
+168:                 Defend Earth from the alien invasion!
+169:             </p>
+170:             <p style="color: #0f0; margin: 10px 0;">Use ← → to move, SPACE to shoot</p>
+171:             <p style="color: #ff0; margin: 20px 0;">Different aliens = Different points!</p>
+172:             <button id="startBtn">START GAME</button>
+173:         </div>
+174: 
+175:         <div class="game-over-screen" id="gameOverScreen">
+176:             <h2>GAME OVER</h2>
+177:             <p class="final-score">Final Score: <span id="finalScore">0</span></p>
+178:             <button id="restartBtn">PLAY AGAIN</button>
+179:         </div>
+180:     </div>
+181: 
+182:     <script>
+183:         class SoundEffects {
+184:             constructor() {
+185:                 this.enabled = true;
+186:                 this.audioContext = null;
+187:                 this.initAudio();
+188:             }
+189: 
+190:             initAudio() {
+191:                 try {
+192:                     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+193:                 } catch (e) {
+194:                     console.log('Web Audio API not supported');
+195:                 }
+196:             }
+197: 
+198:             playShoot() {
+199:                 if (!this.enabled || !this.audioContext) return;
+200:                 const osc = this.audioContext.createOscillator();
+201:                 const gain = this.audioContext.createGain();
+202:                 osc.connect(gain);
+203:                 gain.connect(this.audioContext.destination);
+204:                 osc.frequency.value = 200;
+205:                 osc.type = 'square';
+206:                 gain.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+207:                 gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+208:                 osc.start();
+209:                 osc.stop(this.audioContext.currentTime + 0.1);
+210:             }
+211: 
+212:             playExplosion() {
+213:                 if (!this.enabled || !this.audioContext) return;
+214:                 const osc = this.audioContext.createOscillator();
+215:                 const gain = this.audioContext.createGain();
+216:                 osc.connect(gain);
+217:                 gain.connect(this.audioContext.destination);
+218:                 osc.frequency.setValueAtTime(200, this.audioContext.currentTime);
+219:                 osc.frequency.exponentialRampToValueAtTime(20, this.audioContext.currentTime + 0.3);
+220:                 osc.type = 'sawtooth';
+221:                 gain.gain.setValueAtTime(0.5, this.audioContext.currentTime);
+222:                 gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+223:                 osc.start();
+224:                 osc.stop(this.audioContext.currentTime + 0.3);
+225:             }
+226: 
+227:             playAlienMove() {
+228:                 if (!this.enabled || !this.audioContext) return;
+229:                 const osc = this.audioContext.createOscillator();
+230:                 const gain = this.audioContext.createGain();
+231:                 osc.connect(gain);
+232:                 gain.connect(this.audioContext.destination);
+233:                 osc.frequency.value = 100;
+234:                 osc.type = 'square';
+235:                 gain.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+236:                 gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.05);
+237:                 osc.start();
+238:                 osc.stop(this.audioContext.currentTime + 0.05);
+239:             }
+240: 
+241:             playGameOver() {
+242:                 if (!this.enabled || !this.audioContext) return;
+243:                 const notes = [440, 392, 349, 330];
+244:                 notes.forEach((freq, i) => {
+245:                     const osc = this.audioContext.createOscillator();
+246:                     const gain = this.audioContext.createGain();
+247:                     osc.connect(gain);
+248:                     gain.connect(this.audioContext.destination);
+249:                     osc.frequency.value = freq;
+250:                     osc.type = 'sine';
+251:                     const startTime = this.audioContext.currentTime + (i * 0.3);
+252:                     gain.gain.setValueAtTime(0.3, startTime);
+253:                     gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5);
+254:                     osc.start(startTime);
+255:                     osc.stop(startTime + 0.5);
+256:                 });
+257:             }
+258: 
+259:             toggle() {
+260:                 this.enabled = !this.enabled;
+261:                 return this.enabled;
+262:             }
+263:         }
+264: 
+265:         class SpaceInvaders {
+266:             constructor() {
+267:                 this.canvas = document.getElementById('gameCanvas');
+268:                 this.ctx = this.canvas.getContext('2d');
+269:                 this.width = this.canvas.width;
+270:                 this.height = this.canvas.height;
+271:                 
+272:                 this.sounds = new SoundEffects();
+273:                 this.keys = {};
+274:                 this.gameRunning = false;
+275:                 this.paused = false;
+276:                 this.animationId = null;
+277:                 
+278:                 this.loadHighScore();
+279:                 this.setupControls();
+280:             }
+281: 
+282:             init() {
+283:                 // Player
+284:                 this.player = {
+285:                     x: this.width / 2 - 20,
+286:                     y: this.height - 60,
+287:                     width: 40,
+288:                     height: 20,
+289:                     speed: 5,
+290:                     lives: 3
+291:                 };
+292: 
+293:                 // Game state
+294:                 this.score = 0;
+295:                 this.level = 1;
+296:                 this.bullets = [];
+297:                 this.alienBullets = [];
+298:                 this.aliens = [];
+299:                 this.alienDirection = 1;
+300:                 this.alienSpeed = 1;
+301:                 this.alienMoveCounter = 0;
+302:                 this.alienShootTimer = 0;
+303:                 
+304:                 this.createAliens();
+305:                 this.updateDisplay();
+306:             }
+307: 
+308:             createAliens() {
+309:                 this.aliens = [];
+310:                 const rows = 5;
+311:                 const cols = 11;
+312:                 const alienWidth = 30;
+313:                 const alienHeight = 20;
+314:                 const padding = 10;
+315:                 const offsetX = 50;
+316:                 const offsetY = 50;
+317: 
+318:                 for (let row = 0; row < rows; row++) {
+319:                     for (let col = 0; col < cols; col++) {
+320:                         this.aliens.push({
+321:                             x: offsetX + col * (alienWidth + padding),
+322:                             y: offsetY + row * (alienHeight + padding),
+323:                             width: alienWidth,
+324:                             height: alienHeight,
+325:                             alive: true,
+326:                             type: row < 1 ? 3 : row < 3 ? 2 : 1, // Different alien types
+327:                             frame: 0
+328:                         });
+329:                     }
+330:                 }
+331:             }
+332: 
+333:             setupControls() {
+334:                 document.addEventListener('keydown', (e) => {
+335:                     this.keys[e.key] = true;
+336:                     if (e.key === ' ' && this.gameRunning && !this.paused) {
+337:                         e.preventDefault();
+338:                         this.shoot();
+339:                     }
+340:                 });
+341: 
+342:                 document.addEventListener('keyup', (e) => {
+343:                     this.keys[e.key] = false;
+344:                 });
+345: 
+346:                 document.getElementById('startBtn').addEventListener('click', () => {
+347:                     document.getElementById('startScreen').classList.remove('visible');
+348:                     this.start();
+349:                 });
+350: 
+351:                 document.getElementById('restartBtn').addEventListener('click', () => {
+352:                     document.getElementById('gameOverScreen').classList.remove('visible');
+353:                     this.start();
+354:                 });
+355: 
+356:                 document.getElementById('soundBtn').addEventListener('click', () => {
+357:                     const enabled = this.sounds.toggle();
+358:                     document.getElementById('soundBtn').textContent = enabled ? '🔊 SOUND ON' : '🔇 SOUND OFF';
+359:                 });
+360: 
+361:                 document.getElementById('pauseBtn').addEventListener('click', () => {
+362:                     this.togglePause();
+363:                 });
+364:             }
+365: 
+366:             start() {
+367:                 this.init();
+368:                 this.gameRunning = true;
+369:                 this.paused = false;
+370:                 this.gameLoop();
+371:             }
+372: 
+373:             togglePause() {
+374:                 if (!this.gameRunning) return;
+375:                 this.paused = !this.paused;
+376:                 document.getElementById('pauseBtn').textContent = this.paused ? '▶ RESUME' : '⏸ PAUSE';
+377:                 if (!this.paused) {
+378:                     this.gameLoop();
+379:                 }
+380:             }
+381: 
+382:             shoot() {
+383:                 if (this.bullets.length < 3) { // Limit bullets on screen
+384:                     this.bullets.push({
+385:                         x: this.player.x + this.player.width / 2 - 2,
+386:                         y: this.player.y,
+387:                         width: 4,
+388:                         height: 10,
+389:                         speed: 7
+390:                     });
+391:                     this.sounds.playShoot();
+392:                 }
+393:             }
+394: 
+395:             update() {
+396:                 if (this.paused) return;
+397: 
+398:                 // Move player
+399:                 if (this.keys['ArrowLeft'] && this.player.x > 0) {
+400:                     this.player.x -= this.player.speed;
+401:                 }
+402:                 if (this.keys['ArrowRight'] && this.player.x < this.width - this.player.width) {
+403:                     this.player.x += this.player.speed;
+404:                 }
+405: 
+406:                 // Move bullets
+407:                 this.bullets = this.bullets.filter(bullet => {
+408:                     bullet.y -= bullet.speed;
+409:                     return bullet.y > 0;
+410:                 });
+411: 
+412:                 // Move alien bullets
+413:                 this.alienBullets = this.alienBullets.filter(bullet => {
+414:                     bullet.y += bullet.speed;
+415:                     return bullet.y < this.height;
+416:                 });
+417: 
+418:                 // Move aliens
+419:                 this.alienMoveCounter++;
+420:                 if (this.alienMoveCounter > 60 / this.alienSpeed) {
+421:                     this.moveAliens();
+422:                     this.alienMoveCounter = 0;
+423:                 }
+424: 
+425:                 // Alien shooting
+426:                 this.alienShootTimer++;
+427:                 if (this.alienShootTimer > 120 - (this.level * 10)) {
+428:                     this.alienShoot();
+429:                     this.alienShootTimer = 0;
+430:                 }
+431: 
+432:                 // Check collisions
+433:                 this.checkCollisions();
+434: 
+435:                 // Check win condition
+436:                 if (this.aliens.filter(a => a.alive).length === 0) {
+437:                     this.nextLevel();
+438:                 }
+439: 
+440:                 // Check if aliens reached bottom
+441:                 for (let alien of this.aliens) {
+442:                     if (alien.alive && alien.y + alien.height > this.player.y) {
+443:                         this.gameOver();
+444:                         return;
+445:                     }
+446:                 }
+447:             }
+448: 
+449:             moveAliens() {
+450:                 let moveDown = false;
+451:                 
+452:                 // Check if any alien hit the edge
+453:                 for (let alien of this.aliens) {
+454:                     if (!alien.alive) continue;
+455:                     if ((alien.x <= 0 && this.alienDirection < 0) || 
+456:                         (alien.x + alien.width >= this.width && this.alienDirection > 0)) {
+457:                         moveDown = true;
+458:                         this.alienDirection *= -1;
+459:                         break;
+460:                     }
+461:                 }
+462: 
+463:                 // Move all aliens
+464:                 for (let alien of this.aliens) {
+465:                     if (!alien.alive) continue;
+466:                     alien.x += this.alienDirection * 10;
+467:                     if (moveDown) {
+468:                         alien.y += 20;
+469:                     }
+470:                     alien.frame = (alien.frame + 1) % 2;
+471:                 }
+472: 
+473:                 if (moveDown) {
+474:                     this.sounds.playAlienMove();
+475:                 }
+476:             }
+477: 
+478:             alienShoot() {
+479:                 const aliveAliens = this.aliens.filter(a => a.alive);
+480:                 if (aliveAliens.length === 0) return;
+481:                 
+482:                 const shooter = aliveAliens[Math.floor(Math.random() * aliveAliens.length)];
+483:                 this.alienBullets.push({
+484:                     x: shooter.x + shooter.width / 2 - 2,
+485:                     y: shooter.y + shooter.height,
+486:                     width: 4,
+487:                     height: 10,
+488:                     speed: 4
+489:                 });
+490:             }
+491: 
+492:             checkCollisions() {
+493:                 // Bullet hits alien
+494:                 for (let bullet of this.bullets) {
+495:                     for (let alien of this.aliens) {
+496:                         if (!alien.alive) continue;
+497:                         if (this.isColliding(bullet, alien)) {
+498:                             alien.alive = false;
+499:                             bullet.y = -100; // Remove bullet
+500:                             this.score += alien.type * 10;
+501:                             this.sounds.playExplosion();
+502:                             this.updateDisplay();
+503:                         }
+504:                     }
+505:                 }
+506: 
+507:                 // Alien bullet hits player
+508:                 for (let bullet of this.alienBullets) {
+509:                     if (this.isColliding(bullet, this.player)) {
+510:                         bullet.y = this.height + 100;
+511:                         this.player.lives--;
+512:                         this.sounds.playExplosion();
+513:                         this.updateDisplay();
+514:                         
+515:                         if (this.player.lives <= 0) {
+516:                             this.gameOver();
+517:                         }
+518:                     }
+519:                 }
+520:             }
+521: 
+522:             isColliding(rect1, rect2) {
+523:                 return rect1.x < rect2.x + rect2.width &&
+524:                        rect1.x + rect1.width > rect2.x &&
+525:                        rect1.y < rect2.y + rect2.height &&
+526:                        rect1.y + rect1.height > rect2.y;
+527:             }
+528: 
+529:             nextLevel() {
+530:                 this.level++;
+531:                 this.alienSpeed += 0.5;
+532:                 this.createAliens();
+533:                 this.bullets = [];
+534:                 this.alienBullets = [];
+535:                 this.updateDisplay();
+536:             }
+537: 
+538:             gameOver() {
+539:                 this.gameRunning = false;
+540:                 this.paused = false;
+541:                 this.sounds.playGameOver();
+542:                 
+543:                 if (this.score > this.highScore) {
+544:                     this.highScore = this.score;
+545:                     this.saveHighScore();
+546:                 }
+547:                 
+548:                 document.getElementById('finalScore').textContent = this.score;
+549:                 document.getElementById('gameOverScreen').classList.add('visible');
+550:             }
+551: 
+552:             draw() {
+553:                 // Clear canvas
+554:                 this.ctx.fillStyle = '#000';
+555:                 this.ctx.fillRect(0, 0, this.width, this.height);
+556: 
+557:                 // Draw stars background
+558:                 this.ctx.fillStyle = '#fff';
+559:                 for (let i = 0; i < 50; i++) {
+560:                     const x = (i * 37) % this.width;
+561:                     const y = (i * 71) % this.height;
+562:                     this.ctx.fillRect(x, y, 1, 1);
+563:                 }
+564: 
+565:                 // Draw player
+566:                 this.ctx.fillStyle = '#0f0';
+567:                 this.ctx.fillRect(this.player.x, this.player.y, this.player.width, this.player.height);
+568:                 // Player cannon
+569:                 this.ctx.fillRect(this.player.x + 15, this.player.y - 10, 10, 10);
+570: 
+571:                 // Draw bullets
+572:                 this.ctx.fillStyle = '#ff0';
+573:                 for (let bullet of this.bullets) {
+574:                     this.ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+575:                 }
+576: 
+577:                 // Draw alien bullets
+578:                 this.ctx.fillStyle = '#f00';
+579:                 for (let bullet of this.alienBullets) {
+580:                     this.ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+581:                 }
+582: 
+583:                 // Draw aliens
+584:                 for (let alien of this.aliens) {
+585:                     if (!alien.alive) continue;
+586:                     
+587:                     this.ctx.fillStyle = alien.type === 3 ? '#f0f' : alien.type === 2 ? '#0ff' : '#fff';
+588:                     
+589:                     // Simple alien shape
+590:                     if (alien.frame === 0) {
+591:                         this.ctx.fillRect(alien.x, alien.y, alien.width, alien.height);
+592:                         this.ctx.fillRect(alien.x + 5, alien.y - 5, 5, 5);
+593:                         this.ctx.fillRect(alien.x + 20, alien.y - 5, 5, 5);
+594:                     } else {
+595:                         this.ctx.fillRect(alien.x, alien.y, alien.width, alien.height);
+596:                         this.ctx.fillRect(alien.x, alien.y - 5, 5, 5);
+597:                         this.ctx.fillRect(alien.x + 25, alien.y - 5, 5, 5);
+598:                     }
+599:                 }
+600: 
+601:                 // Draw pause text
+602:                 if (this.paused) {
+603:                     this.ctx.fillStyle = '#0f0';
+604:                     this.ctx.font = 'bold 48px Courier New';
+605:                     this.ctx.textAlign = 'center';
+606:                     this.ctx.fillText('PAUSED', this.width / 2, this.height / 2);
+607:                 }
+608:             }
+609: 
+610:             updateDisplay() {
+611:                 document.getElementById('score').textContent = this.score;
+612:                 document.getElementById('lives').textContent = this.player.lives;
+613:                 document.getElementById('level').textContent = this.level;
+614:                 document.getElementById('highScore').textContent = this.highScore;
+615:             }
+616: 
+617:             loadHighScore() {
+618:                 this.highScore = parseInt(localStorage.getItem('spaceInvadersHighScore') || '0');
+619:                 document.getElementById('highScore').textContent = this.highScore;
+620:             }
+621: 
+622:             saveHighScore() {
+623:                 localStorage.setItem('spaceInvadersHighScore', this.highScore.toString());
+624:             }
+625: 
+626:             gameLoop() {
+627:                 if (!this.gameRunning) return;
+628:                 
+629:                 this.update();
+630:                 this.draw();
+631:                 
+632:                 if (!this.paused) {
+633:                     this.animationId = requestAnimationFrame(() => this.gameLoop());
+634:                 }
+635:             }
+636:         }
+637: 
+638:         // Initialize game
+639:         const game = new SpaceInvaders();
+640:     </script>
+641: </body>
+642: </html>
+```

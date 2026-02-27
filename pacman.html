@@ -1,0 +1,648 @@
+### /Users/daviddodd/pacman.html
+```html
+1: <!DOCTYPE html>
+2: <html lang="en">
+3: <head>
+4:     <meta charset="UTF-8">
+5:     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+6:     <title>Pac-Man - Retro Arcade</title>
+7:     <style>
+8:         * {
+9:             margin: 0;
+10:             padding: 0;
+11:             box-sizing: border-box;
+12:         }
+13: 
+14:         body {
+15:             background: #000;
+16:             display: flex;
+17:             justify-content: center;
+18:             align-items: center;
+19:             min-height: 100vh;
+20:             font-family: 'Courier New', monospace;
+21:             overflow: hidden;
+22:         }
+23: 
+24:         .game-container {
+25:             text-align: center;
+26:             background: #0a0a0a;
+27:             padding: 20px;
+28:             border-radius: 10px;
+29:             box-shadow: 0 0 50px rgba(255, 255, 0, 0.3);
+30:         }
+31: 
+32:         h1 {
+33:             color: #ff0;
+34:             font-size: 2.5em;
+35:             margin-bottom: 10px;
+36:             text-shadow: 0 0 10px #ff0;
+37:             font-weight: bold;
+38:         }
+39: 
+40:         .game-info {
+41:             display: flex;
+42:             justify-content: space-around;
+43:             color: #fff;
+44:             font-size: 1.3em;
+45:             margin-bottom: 10px;
+46:             padding: 10px;
+47:             background: #111;
+48:             border-radius: 5px;
+49:         }
+50: 
+51:         .info-item {
+52:             padding: 0 20px;
+53:         }
+54: 
+55:         .score { color: #ff0; }
+56:         .lives { color: #f66; }
+57:         .level { color: #0ff; }
+58: 
+59:         canvas {
+60:             border: 3px solid #00f;
+61:             background: #000;
+62:             display: block;
+63:             margin: 0 auto;
+64:             box-shadow: 0 0 20px rgba(0, 0, 255, 0.5);
+65:         }
+66: 
+67:         .controls {
+68:             margin-top: 20px;
+69:             color: #ff0;
+70:             font-size: 0.9em;
+71:         }
+72: 
+73:         button {
+74:             background: #ff0;
+75:             color: #000;
+76:             border: none;
+77:             padding: 10px 30px;
+78:             font-size: 1.2em;
+79:             font-family: 'Courier New', monospace;
+80:             font-weight: bold;
+81:             cursor: pointer;
+82:             margin: 10px 5px;
+83:             border-radius: 5px;
+84:             box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+85:             transition: all 0.3s;
+86:         }
+87: 
+88:         button:hover {
+89:             background: #ffd700;
+90:             box-shadow: 0 0 20px rgba(255, 255, 0, 0.8);
+91:             transform: scale(1.05);
+92:         }
+93: 
+94:         .game-over-screen, .start-screen {
+95:             position: absolute;
+96:             top: 50%;
+97:             left: 50%;
+98:             transform: translate(-50%, -50%);
+99:             background: rgba(0, 0, 0, 0.95);
+100:             padding: 40px;
+101:             border-radius: 10px;
+102:             border: 3px solid #ff0;
+103:             text-align: center;
+104:             display: none;
+105:             z-index: 10;
+106:         }
+107: 
+108:         .game-over-screen.visible, .start-screen.visible {
+109:             display: block;
+110:         }
+111: 
+112:         .game-over-screen h2 {
+113:             color: #f00;
+114:             font-size: 3em;
+115:             margin-bottom: 20px;
+116:             text-shadow: 0 0 20px #f00;
+117:         }
+118: 
+119:         .start-screen h2 {
+120:             color: #ff0;
+121:             text-shadow: 0 0 20px #ff0;
+122:         }
+123: 
+124:         .final-score {
+125:             color: #ff0;
+126:             font-size: 1.5em;
+127:             margin: 20px 0;
+128:         }
+129: 
+130:         @keyframes blink {
+131:             0%, 50% { opacity: 1; }
+132:             51%, 100% { opacity: 0; }
+133:         }
+134:     </style>
+135: </head>
+136: <body>
+137:     <div class="game-container">
+138:         <h1>🟡 PAC-MAN 👻</h1>
+139:         <div class="game-info">
+140:             <div class="info-item score">SCORE: <span id="score">0</span></div>
+141:             <div class="info-item lives">LIVES: <span id="lives">3</span></div>
+142:             <div class="info-item level">LEVEL: <span id="level">1</span></div>
+143:         </div>
+144:         <canvas id="gameCanvas" width="560" height="620"></canvas>
+145:         <div class="controls">
+146:             <p>↑ ↓ ← → ARROW KEYS: Move Pac-Man</p>
+147:             <button id="soundBtn">🔊 SOUND ON</button>
+148:             <button id="pauseBtn">⏸ PAUSE</button>
+149:         </div>
+150: 
+151:         <div class="start-screen visible" id="startScreen">
+152:             <h2>PAC-MAN</h2>
+153:             <p style="color: #ff0; font-size: 1.2em; margin: 20px 0;">
+154:                 Eat all the dots and avoid the ghosts!
+155:             </p>
+156:             <p style="color: #fff; margin: 10px 0;">🟡 Small dots = 10 points</p>
+157:             <p style="color: #fff; margin: 10px 0;">⚪ Power pellets = 50 points</p>
+158:             <p style="color: #0ff; margin: 10px 0;">Eat ghosts after power pellet = 200 points!</p>
+159:             <button id="startBtn">START GAME</button>
+160:         </div>
+161: 
+162:         <div class="game-over-screen" id="gameOverScreen">
+163:             <h2>GAME OVER</h2>
+164:             <p class="final-score">Final Score: <span id="finalScore">0</span></p>
+165:             <button id="restartBtn">PLAY AGAIN</button>
+166:         </div>
+167:     </div>
+168: 
+169:     <script>
+170:         class SoundEffects {
+171:             constructor() {
+172:                 this.enabled = true;
+173:                 this.audioContext = null;
+174:                 this.initAudio();
+175:             }
+176: 
+177:             initAudio() {
+178:                 try {
+179:                     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+180:                 } catch (e) {
+181:                     console.log('Web Audio API not supported');
+182:                 }
+183:             }
+184: 
+185:             playWakka() {
+186:                 if (!this.enabled || !this.audioContext) return;
+187:                 const osc = this.audioContext.createOscillator();
+188:                 const gain = this.audioContext.createGain();
+189:                 osc.connect(gain);
+190:                 gain.connect(this.audioContext.destination);
+191:                 osc.frequency.value = 380;
+192:                 osc.type = 'square';
+193:                 gain.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+194:                 gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+195:                 osc.start();
+196:                 osc.stop(this.audioContext.currentTime + 0.1);
+197:             }
+198: 
+199:             playEatGhost() {
+200:                 if (!this.enabled || !this.audioContext) return;
+201:                 const notes = [200, 400, 600, 800];
+202:                 notes.forEach((freq, i) => {
+203:                     const osc = this.audioContext.createOscillator();
+204:                     const gain = this.audioContext.createGain();
+205:                     osc.connect(gain);
+206:                     gain.connect(this.audioContext.destination);
+207:                     osc.frequency.value = freq;
+208:                     osc.type = 'sine';
+209:                     const startTime = this.audioContext.currentTime + (i * 0.05);
+210:                     gain.gain.setValueAtTime(0.2, startTime);
+211:                     gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.2);
+212:                     osc.start(startTime);
+213:                     osc.stop(startTime + 0.2);
+214:                 });
+215:             }
+216: 
+217:             playDeath() {
+218:                 if (!this.enabled || !this.audioContext) return;
+219:                 const osc = this.audioContext.createOscillator();
+220:                 const gain = this.audioContext.createGain();
+221:                 osc.connect(gain);
+222:                 gain.connect(this.audioContext.destination);
+223:                 osc.frequency.setValueAtTime(400, this.audioContext.currentTime);
+224:                 osc.frequency.exponentialRampToValueAtTime(50, this.audioContext.currentTime + 0.5);
+225:                 osc.type = 'sawtooth';
+226:                 gain.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+227:                 gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
+228:                 osc.start();
+229:                 osc.stop(this.audioContext.currentTime + 0.5);
+230:             }
+231: 
+232:             playPowerUp() {
+233:                 if (!this.enabled || !this.audioContext) return;
+234:                 const notes = [262, 330, 392, 523];
+235:                 notes.forEach((freq, i) => {
+236:                     const osc = this.audioContext.createOscillator();
+237:                     const gain = this.audioContext.createGain();
+238:                     osc.connect(gain);
+239:                     gain.connect(this.audioContext.destination);
+240:                     osc.frequency.value = freq;
+241:                     osc.type = 'triangle';
+242:                     const startTime = this.audioContext.currentTime + (i * 0.1);
+243:                     gain.gain.setValueAtTime(0.2, startTime);
+244:                     gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.2);
+245:                     osc.start(startTime);
+246:                     osc.stop(startTime + 0.2);
+247:                 });
+248:             }
+249: 
+250:             toggle() {
+251:                 this.enabled = !this.enabled;
+252:                 return this.enabled;
+253:             }
+254:         }
+255: 
+256:         class PacMan {
+257:             constructor() {
+258:                 this.canvas = document.getElementById('gameCanvas');
+259:                 this.ctx = this.canvas.getContext('2d');
+260:                 this.tileSize = 20;
+261:                 this.cols = 28;
+262:                 this.rows = 31;
+263:                 
+264:                 this.sounds = new SoundEffects();
+265:                 this.keys = {};
+266:                 this.gameRunning = false;
+267:                 this.paused = false;
+268:                 
+269:                 this.setupControls();
+270:                 this.createMaze();
+271:             }
+272: 
+273:             createMaze() {
+274:                 // 1 = wall, 0 = dot, 2 = power pellet, 3 = empty
+275:                 this.originalMaze = [
+276:                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+277:                     [1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+278:                     [1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
+279:                     [1,2,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,2,1],
+280:                     [1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
+281:                     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+282:                     [1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1],
+283:                     [1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1],
+284:                     [1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1],
+285:                     [1,1,1,1,1,1,0,1,1,1,1,1,3,1,1,3,1,1,1,1,1,0,1,1,1,1,1,1],
+286:                     [1,1,1,1,1,1,0,1,1,1,1,1,3,1,1,3,1,1,1,1,1,0,1,1,1,1,1,1],
+287:                     [1,1,1,1,1,1,0,1,1,3,3,3,3,3,3,3,3,3,3,1,1,0,1,1,1,1,1,1],
+288:                     [1,1,1,1,1,1,0,1,1,3,1,1,1,3,3,1,1,1,3,1,1,0,1,1,1,1,1,1],
+289:                     [1,1,1,1,1,1,0,1,1,3,1,3,3,3,3,3,3,1,3,1,1,0,1,1,1,1,1,1],
+290:                     [3,3,3,3,3,3,0,3,3,3,1,3,3,3,3,3,3,1,3,3,3,0,3,3,3,3,3,3],
+291:                     [1,1,1,1,1,1,0,1,1,3,1,3,3,3,3,3,3,1,3,1,1,0,1,1,1,1,1,1],
+292:                     [1,1,1,1,1,1,0,1,1,3,1,1,1,1,1,1,1,1,3,1,1,0,1,1,1,1,1,1],
+293:                     [1,1,1,1,1,1,0,1,1,3,3,3,3,3,3,3,3,3,3,1,1,0,1,1,1,1,1,1],
+294:                     [1,1,1,1,1,1,0,1,1,3,1,1,1,1,1,1,1,1,3,1,1,0,1,1,1,1,1,1],
+295:                     [1,1,1,1,1,1,0,1,1,3,1,1,1,1,1,1,1,1,3,1,1,0,1,1,1,1,1,1],
+296:                     [1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+297:                     [1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
+298:                     [1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
+299:                     [1,2,0,0,1,1,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,1,1,0,0,2,1],
+300:                     [1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1],
+301:                     [1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1],
+302:                     [1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1],
+303:                     [1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1],
+304:                     [1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1],
+305:                     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+306:                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+307:                 ];
+308:             }
+309: 
+310:             init() {
+311:                 this.maze = JSON.parse(JSON.stringify(this.originalMaze));
+312:                 
+313:                 this.pacman = {
+314:                     x: 14,
+315:                     y: 23,
+316:                     direction: 0,
+317:                     nextDirection: 0,
+318:                     speed: 0.15,
+319:                     mouthOpen: true,
+320:                     animCounter: 0
+321:                 };
+322: 
+323:                 this.ghosts = [
+324:                     { x: 12, y: 14, color: '#f00', direction: 0, name: 'Blinky' },
+325:                     { x: 14, y: 14, color: '#f0f', direction: 2, name: 'Pinky' },
+326:                     { x: 13, y: 15, color: '#0ff', direction: 1, name: 'Inky' },
+327:                     { x: 15, y: 15, color: '#fa0', direction: 3, name: 'Clyde' }
+328:                 ];
+329: 
+330:                 this.score = 0;
+331:                 this.lives = 3;
+332:                 this.level = 1;
+333:                 this.powerMode = false;
+334:                 this.powerTimer = 0;
+335:                 this.dots = this.countDots();
+336:                 this.wakkaTimer = 0;
+337:                 
+338:                 this.updateDisplay();
+339:             }
+340: 
+341:             countDots() {
+342:                 let count = 0;
+343:                 for (let row of this.maze) {
+344:                     for (let cell of row) {
+345:                         if (cell === 0 || cell === 2) count++;
+346:                     }
+347:                 }
+348:                 return count;
+349:             }
+350: 
+351:             setupControls() {
+352:                 document.addEventListener('keydown', (e) => {
+353:                     if (!this.gameRunning || this.paused) return;
+354:                     
+355:                     switch(e.key) {
+356:                         case 'ArrowUp': this.pacman.nextDirection = 0; e.preventDefault(); break;
+357:                         case 'ArrowRight': this.pacman.nextDirection = 1; e.preventDefault(); break;
+358:                         case 'ArrowDown': this.pacman.nextDirection = 2; e.preventDefault(); break;
+359:                         case 'ArrowLeft': this.pacman.nextDirection = 3; e.preventDefault(); break;
+360:                     }
+361:                 });
+362: 
+363:                 document.getElementById('startBtn').addEventListener('click', () => {
+364:                     document.getElementById('startScreen').classList.remove('visible');
+365:                     this.start();
+366:                 });
+367: 
+368:                 document.getElementById('restartBtn').addEventListener('click', () => {
+369:                     document.getElementById('gameOverScreen').classList.remove('visible');
+370:                     this.start();
+371:                 });
+372: 
+373:                 document.getElementById('soundBtn').addEventListener('click', () => {
+374:                     const enabled = this.sounds.toggle();
+375:                     document.getElementById('soundBtn').textContent = enabled ? '🔊 SOUND ON' : '🔇 SOUND OFF';
+376:                 });
+377: 
+378:                 document.getElementById('pauseBtn').addEventListener('click', () => {
+379:                     this.togglePause();
+380:                 });
+381:             }
+382: 
+383:             start() {
+384:                 this.init();
+385:                 this.gameRunning = true;
+386:                 this.paused = false;
+387:                 this.gameLoop();
+388:             }
+389: 
+390:             togglePause() {
+391:                 if (!this.gameRunning) return;
+392:                 this.paused = !this.paused;
+393:                 document.getElementById('pauseBtn').textContent = this.paused ? '▶ RESUME' : '⏸ PAUSE';
+394:                 if (!this.paused) {
+395:                     this.gameLoop();
+396:                 }
+397:             }
+398: 
+399:             update() {
+400:                 if (this.paused) return;
+401: 
+402:                 // Update power mode timer
+403:                 if (this.powerMode) {
+404:                     this.powerTimer--;
+405:                     if (this.powerTimer <= 0) {
+406:                         this.powerMode = false;
+407:                     }
+408:                 }
+409: 
+410:                 // Try to change direction
+411:                 if (this.canMove(this.pacman.x, this.pacman.y, this.pacman.nextDirection)) {
+412:                     this.pacman.direction = this.pacman.nextDirection;
+413:                 }
+414: 
+415:                 // Move Pac-Man
+416:                 if (this.canMove(this.pacman.x, this.pacman.y, this.pacman.direction)) {
+417:                     const dir = [[0, -1], [1, 0], [0, 1], [-1, 0]][this.pacman.direction];
+418:                     this.pacman.x += dir[0] * this.pacman.speed;
+419:                     this.pacman.y += dir[1] * this.pacman.speed;
+420:                 }
+421: 
+422:                 // Wrap around screen
+423:                 if (this.pacman.x < 0) this.pacman.x = this.cols - 1;
+424:                 if (this.pacman.x >= this.cols) this.pacman.x = 0;
+425: 
+426:                 // Check dot collision
+427:                 const gridX = Math.round(this.pacman.x);
+428:                 const gridY = Math.round(this.pacman.y);
+429:                 
+430:                 if (this.maze[gridY] && this.maze[gridY][gridX] === 0) {
+431:                     this.maze[gridY][gridX] = 3;
+432:                     this.score += 10;
+433:                     this.dots--;
+434:                     this.wakkaTimer = 10;
+435:                     this.sounds.playWakka();
+436:                     this.updateDisplay();
+437:                 } else if (this.maze[gridY] && this.maze[gridY][gridX] === 2) {
+438:                     this.maze[gridY][gridX] = 3;
+439:                     this.score += 50;
+440:                     this.dots--;
+441:                     this.powerMode = true;
+442:                     this.powerTimer = 200;
+443:                     this.sounds.playPowerUp();
+444:                     this.updateDisplay();
+445:                 }
+446: 
+447:                 // Check level complete
+448:                 if (this.dots === 0) {
+449:                     this.nextLevel();
+450:                     return;
+451:                 }
+452: 
+453:                 // Move ghosts
+454:                 for (let ghost of this.ghosts) {
+455:                     if (Math.random() < 0.02) {
+456:                         ghost.direction = Math.floor(Math.random() * 4);
+457:                     }
+458:                     
+459:                     if (this.canMove(ghost.x, ghost.y, ghost.direction)) {
+460:                         const dir = [[0, -1], [1, 0], [0, 1], [-1, 0]][ghost.direction];
+461:                         const speed = this.powerMode ? 0.08 : 0.1;
+462:                         ghost.x += dir[0] * speed;
+463:                         ghost.y += dir[1] * speed;
+464:                     } else {
+465:                         ghost.direction = Math.floor(Math.random() * 4);
+466:                     }
+467: 
+468:                     // Wrap around
+469:                     if (ghost.x < 0) ghost.x = this.cols - 1;
+470:                     if (ghost.x >= this.cols) ghost.x = 0;
+471:                 }
+472: 
+473:                 // Check collisions with ghosts
+474:                 for (let ghost of this.ghosts) {
+475:                     const dist = Math.sqrt(
+476:                         Math.pow(this.pacman.x - ghost.x, 2) + 
+477:                         Math.pow(this.pacman.y - ghost.y, 2)
+478:                     );
+479:                     
+480:                     if (dist < 0.5) {
+481:                         if (this.powerMode) {
+482:                             this.score += 200;
+483:                             ghost.x = 14;
+484:                             ghost.y = 14;
+485:                             this.sounds.playEatGhost();
+486:                             this.updateDisplay();
+487:                         } else {
+488:                             this.loseLife();
+489:                         }
+490:                     }
+491:                 }
+492: 
+493:                 // Animation
+494:                 this.pacman.animCounter++;
+495:                 if (this.pacman.animCounter > 10) {
+496:                     this.pacman.mouthOpen = !this.pacman.mouthOpen;
+497:                     this.pacman.animCounter = 0;
+498:                 }
+499:             }
+500: 
+501:             canMove(x, y, direction) {
+502:                 const dir = [[0, -1], [1, 0], [0, 1], [-1, 0]][direction];
+503:                 const nextX = Math.round(x + dir[0] * 0.5);
+504:                 const nextY = Math.round(y + dir[1] * 0.5);
+505:                 
+506:                 if (nextY < 0 || nextY >= this.rows || nextX < 0 || nextX >= this.cols) {
+507:                     return false;
+508:                 }
+509:                 
+510:                 return this.maze[nextY][nextX] !== 1;
+511:             }
+512: 
+513:             loseLife() {
+514:                 this.lives--;
+515:                 this.sounds.playDeath();
+516:                 this.updateDisplay();
+517:                 
+518:                 if (this.lives <= 0) {
+519:                     this.gameOver();
+520:                 } else {
+521:                     // Reset positions
+522:                     this.pacman.x = 14;
+523:                     this.pacman.y = 23;
+524:                     this.ghosts.forEach((ghost, i) => {
+525:                         ghost.x = 12 + i;
+526:                         ghost.y = 14;
+527:                     });
+528:                     this.powerMode = false;
+529:                 }
+530:             }
+531: 
+532:             nextLevel() {
+533:                 this.level++;
+534:                 this.init();
+535:             }
+536: 
+537:             gameOver() {
+538:                 this.gameRunning = false;
+539:                 this.paused = false;
+540:                 document.getElementById('finalScore').textContent = this.score;
+541:                 document.getElementById('gameOverScreen').classList.add('visible');
+542:             }
+543: 
+544:             draw() {
+545:                 this.ctx.fillStyle = '#000';
+546:                 this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+547: 
+548:                 // Draw maze
+549:                 for (let row = 0; row < this.rows; row++) {
+550:                     for (let col = 0; col < this.cols; col++) {
+551:                         const cell = this.maze[row][col];
+552:                         const x = col * this.tileSize;
+553:                         const y = row * this.tileSize;
+554: 
+555:                         if (cell === 1) {
+556:                             this.ctx.fillStyle = '#00f';
+557:                             this.ctx.fillRect(x, y, this.tileSize, this.tileSize);
+558:                         } else if (cell === 0) {
+559:                             this.ctx.fillStyle = '#fff';
+560:                             this.ctx.beginPath();
+561:                             this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2, 2, 0, Math.PI * 2);
+562:                             this.ctx.fill();
+563:                         } else if (cell === 2) {
+564:                             this.ctx.fillStyle = '#fff';
+565:                             this.ctx.beginPath();
+566:                             this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2, 5, 0, Math.PI * 2);
+567:                             this.ctx.fill();
+568:                         }
+569:                     }
+570:                 }
+571: 
+572:                 // Draw Pac-Man
+573:                 const px = this.pacman.x * this.tileSize;
+574:                 const py = this.pacman.y * this.tileSize;
+575:                 this.ctx.fillStyle = '#ff0';
+576:                 this.ctx.beginPath();
+577:                 
+578:                 if (this.pacman.mouthOpen) {
+579:                     const startAngle = (this.pacman.direction * Math.PI / 2) + 0.2;
+580:                     const endAngle = (this.pacman.direction * Math.PI / 2) - 0.2 + Math.PI * 2;
+581:                     this.ctx.arc(px + this.tileSize / 2, py + this.tileSize / 2, this.tileSize / 2, startAngle, endAngle);
+582:                     this.ctx.lineTo(px + this.tileSize / 2, py + this.tileSize / 2);
+583:                 } else {
+584:                     this.ctx.arc(px + this.tileSize / 2, py + this.tileSize / 2, this.tileSize / 2, 0, Math.PI * 2);
+585:                 }
+586:                 this.ctx.fill();
+587: 
+588:                 // Draw ghosts
+589:                 for (let ghost of this.ghosts) {
+590:                     const gx = ghost.x * this.tileSize;
+591:                     const gy = ghost.y * this.tileSize;
+592:                     
+593:                     this.ctx.fillStyle = this.powerMode ? '#00f' : ghost.color;
+594:                     this.ctx.beginPath();
+595:                     this.ctx.arc(gx + this.tileSize / 2, gy + this.tileSize / 4, this.tileSize / 2, Math.PI, 0);
+596:                     this.ctx.lineTo(gx + this.tileSize, gy + this.tileSize);
+597:                     this.ctx.lineTo(gx + this.tileSize * 0.75, gy + this.tileSize * 0.75);
+598:                     this.ctx.lineTo(gx + this.tileSize * 0.5, gy + this.tileSize);
+599:                     this.ctx.lineTo(gx + this.tileSize * 0.25, gy + this.tileSize * 0.75);
+600:                     this.ctx.lineTo(gx, gy + this.tileSize);
+601:                     this.ctx.closePath();
+602:                     this.ctx.fill();
+603: 
+604:                     // Eyes
+605:                     if (!this.powerMode) {
+606:                         this.ctx.fillStyle = '#fff';
+607:                         this.ctx.fillRect(gx + 4, gy + 4, 4, 6);
+608:                         this.ctx.fillRect(gx + 12, gy + 4, 4, 6);
+609:                         this.ctx.fillStyle = '#000';
+610:                         this.ctx.fillRect(gx + 5, gy + 5, 2, 4);
+611:                         this.ctx.fillRect(gx + 13, gy + 5, 2, 4);
+612:                     }
+613:                 }
+614: 
+615:                 // Draw pause text
+616:                 if (this.paused) {
+617:                     this.ctx.fillStyle = '#ff0';
+618:                     this.ctx.font = 'bold 48px Courier New';
+619:                     this.ctx.textAlign = 'center';
+620:                     this.ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2);
+621:                 }
+622:             }
+623: 
+624:             updateDisplay() {
+625:                 document.getElementById('score').textContent = this.score;
+626:                 document.getElementById('lives').textContent = this.lives;
+627:                 document.getElementById('level').textContent = this.level;
+628:             }
+629: 
+630:             gameLoop() {
+631:                 if (!this.gameRunning) return;
+632:                 
+633:                 this.update();
+634:                 this.draw();
+635:                 
+636:                 if (!this.paused) {
+637:                     requestAnimationFrame(() => this.gameLoop());
+638:                 }
+639:             }
+640:         }
+641: 
+642:         const game = new PacMan();
+643:     </script>
+644: </body>
+645: </html>
+```
