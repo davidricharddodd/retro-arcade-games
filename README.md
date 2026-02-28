@@ -1,172 +1,105 @@
-# 🕹️ Retro Arcade Games Collection
+# 🕹️ Retro Arcade Games
 
-A collection of classic arcade games built with vanilla JavaScript, HTML5 Canvas, and CSS3. Play your favorite retro games right in your browser!
-
-![Retro Arcade](https://img.shields.io/badge/Games-3-brightgreen)
-![Browser](https://img.shields.io/badge/Platform-Browser-blue)
-![License](https://img.shields.io/badge/License-MIT-yellow)
+Classic arcade games collection built with vanilla JavaScript and HTML5 Canvas.
 
 ## 🎮 Games Included
 
-### 🔴🟡 Connect 4
-Classic strategy game where you connect four pieces in a row to win!
+### 🔴 Connect 4
+Classic two-player strategy game with AI opponent option. Connect four discs in a row (horizontal, vertical, or diagonal) to win!
 
 **Features:**
-- 👥 Player vs Player mode
-- 🤖 Player vs AI mode with 3 difficulty levels
-  - Easy: Random moves
-  - Medium: Strategic positioning
-  - Hard: Advanced threat evaluation
-- 🔊 Sound effects (drop, win, error)
-- ✨ Smooth drop animations
-- 📱 Mobile responsive
+- Player vs Player mode
+- Player vs AI mode with smart opponent
+- Animated disc drops with physics
+- Win detection for all directions
+- Retro neon styling
 
-### 🚀👾 Space Invaders
-Defend Earth from waves of alien invaders!
+### 👾 Space Invaders
+Defend Earth from waves of alien invaders in this classic arcade shooter!
 
 **Features:**
-- 👾 Classic alien formations
-- 🎯 Player shooting mechanics
-- 💥 Aliens shoot back!
-- 📈 Progressive difficulty levels
-- ❤️ Lives system
-- 🏆 High score persistence (localStorage)
-- 🔊 Retro sound effects
-- ⏸️ Pause functionality
+- 55 aliens in formation (5 rows × 11 columns)
+- Three alien types with different point values
+- Player shooting mechanics
+- Alien projectiles
+- 4 destructible shields
+- Progressive difficulty (aliens speed up each level)
+- Score, lives, and level tracking
 
-### 🟡👻 Pac-Man
-Navigate the maze, eat dots, and avoid the ghosts!
+### 🟡 Pac-Man
+Navigate the maze, eat dots, and avoid the colorful ghosts!
 
 **Features:**
-- 🗺️ Classic maze layout
-- 👻 4 unique ghosts (Blinky, Pinky, Inky, Clyde)
-- ⚡ Power pellets to turn the tables
-- 🎚️ Progressive levels
-- ❤️ Lives system
-- 📊 Score tracking
-- 🔊 Sound effects (wakka, power-up, death)
-- ⌨️ Smooth keyboard controls
+- Full classic maze layout
+- Animated Pac-Man with chomping mouth
+- 4 AI-controlled ghosts (red, pink, cyan, orange)
+- Dots and power pellets
+- Power mode - eat ghosts for bonus points
+- Score system with lives
+- Arrow key controls
 
-## 🚀 Play Now
+### 🐍 Snake
+Classic snake game - eat food to grow longer, but don't hit yourself or the walls!
 
-**[👉 Play Online Here!](https://davidricharddodd.github.io/retro-arcade-games/)**
+**Features:**
+- Smooth snake movement
+- Food spawning system
+- Score tracking with high score (saved to localStorage)
+- Progressive speed increase
+- Grid-based gameplay with glow effects
+- Arrow key controls
 
-## 💻 Local Setup
+### 🎮 Tetris
+Arrange falling tetrominoes to complete lines and rack up points!
 
-No build process needed! Just clone and play:
+**Features:**
+- All 7 classic tetromino shapes (I, O, T, L, J, S, Z)
+- Piece rotation
+- Next piece preview
+- Score, level, and lines tracking
+- Progressive speed increase
+- Hard drop functionality (Space bar)
+- Pause feature
+- Beautiful color-coded pieces
 
-```bash
-# Clone the repository
-git clone https://github.com/davidricharddodd/retro-arcade-games.git
+## 🚀 Getting Started
 
-# Navigate to the directory
-cd retro-arcade-games
-
-# Open in your browser
-open index.html
-# or simply double-click index.html
-```
+Simply open `index.html` in your web browser to access the game menu and start playing!
 
 ## 🎯 Controls
 
 ### Connect 4
-- **Mouse Click**: Drop piece in column
+- Click on columns to drop your disc
 
 ### Space Invaders
-- **← →**: Move ship left/right
-- **SPACE**: Shoot
-- **P**: Pause
+- Arrow Left/Right: Move ship
+- Space: Shoot
 
 ### Pac-Man
-- **↑ ↓ ← →**: Move Pac-Man
-- **P**: Pause
+- Arrow Keys: Move Pac-Man
 
-## 🛠️ Technical Stack
+### Snake
+- Arrow Keys: Change direction
+- Game auto-starts on first arrow key press
 
-- **HTML5 Canvas**: For game rendering
-- **Vanilla JavaScript**: Game logic (no frameworks!)
-- **CSS3**: Styling and animations
-- **Web Audio API**: Sound effects
+### Tetris
+- Arrow Left/Right: Move piece
+- Arrow Up: Rotate piece
+- Arrow Down: Soft drop
+- Space: Hard drop
+- P: Pause
 
-## 🎨 Features
+## 🛠️ Technologies Used
 
-- ✅ 100% browser-based - no downloads required
-- ✅ Retro pixel-perfect graphics
-- ✅ Classic sound effects
-- ✅ Keyboard controls
-- ✅ Responsive design
-- ✅ High score tracking
-- ✅ Pause/resume functionality
-- ✅ No external dependencies
+- HTML5 Canvas for game rendering
+- Vanilla JavaScript for game logic
+- CSS3 for styling and animations
+- No external libraries or frameworks
 
-## 🧠 AI Implementation
+## 📝 License
 
-The Connect 4 AI uses a **rule-based decision tree** algorithm:
-
-1. **Offensive**: Check for immediate winning moves
-2. **Defensive**: Block opponent's winning moves
-3. **Strategic**: 
-   - Easy: Random valid moves
-   - Medium: Center column preference
-   - Hard: Position evaluation with threat counting
-
-This is a traditional game-playing algorithm, not machine learning - ensuring instant response times and deterministic behavior.
-
-## 📁 Project Structure
-
-```
-retro-arcade-games/
-├── index.html              # Main menu/launcher
-├── connect4.html           # Connect 4 game
-├── space-invaders.html     # Space Invaders game
-├── pacman.html            # Pac-Man game
-└── README.md              # This file
-```
-
-## 🎯 Scoring
-
-### Connect 4
-- Win the game!
-
-### Space Invaders
-- Top row aliens: 30 points
-- Middle row aliens: 20 points  
-- Bottom row aliens: 10 points
-
-### Pac-Man
-- Small dots: 10 points
-- Power pellets: 50 points
-- Eating ghosts: 200 points each
-
-## 🚧 Future Enhancements
-
-- [ ] Add more classic games (Tetris, Snake, Breakout)
-- [ ] Global leaderboard system
-- [ ] Achievements/badges
-- [ ] Mobile touch controls
-- [ ] CRT screen effect toggle
-- [ ] Game tutorials
-- [ ] Two-player online mode
-
-## 🤝 Contributing
-
-Feel free to fork this project and add your own retro games! Pull requests are welcome.
-
-## 📄 License
-
-MIT License - feel free to use this code for learning or your own projects!
-
-## 👨‍💻 Author
-
-**David Dodd**
-- GitHub: [@davidricharddodd](https://github.com/davidricharddodd)
-
-## 🙏 Acknowledgments
-
-Inspired by the golden age of arcade gaming! These implementations pay homage to the original classics while adding modern web features.
+MIT License - feel free to use and modify these games!
 
 ---
 
-**Made with ❤️ and nostalgia**
-
-🎮 Happy Gaming! 🎮
+Built with ❤️ for retro gaming enthusiasts

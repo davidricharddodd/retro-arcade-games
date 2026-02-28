@@ -1,813 +1,438 @@
-### /Users/daviddodd/connect4.html
-```html
-1: <!DOCTYPE html>
-2: <html lang="en">
-3: <head>
-4:     <meta charset="UTF-8">
-5:     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-6:     <title>Connect 4 Game - With AI & Sound</title>
-7:     <style>
-8:         * {
-9:             margin: 0;
-10:             padding: 0;
-11:             box-sizing: border-box;
-12:         }
-13: 
-14:         body {
-15:             font-family: 'Arial', sans-serif;
-16:             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-17:             min-height: 100vh;
-18:             display: flex;
-19:             justify-content: center;
-20:             align-items: center;
-21:             padding: 20px;
-22:         }
-23: 
-24:         .game-container {
-25:             text-align: center;
-26:             background: white;
-27:             padding: 30px;
-28:             border-radius: 20px;
-29:             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-30:             max-width: 700px;
-31:         }
-32: 
-33:         h1 {
-34:             color: #333;
-35:             margin-bottom: 20px;
-36:             font-size: 2.5em;
-37:             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-38:         }
-39: 
-40:         .game-mode-selector {
-41:             margin-bottom: 20px;
-42:             padding: 20px;
-43:             background: #f8f9fa;
-44:             border-radius: 10px;
-45:         }
-46: 
-47:         .game-mode-selector h3 {
-48:             margin-bottom: 15px;
-49:             color: #555;
-50:         }
-51: 
-52:         .mode-buttons {
-53:             display: flex;
-54:             gap: 10px;
-55:             justify-content: center;
-56:             flex-wrap: wrap;
-57:         }
-58: 
-59:         .mode-btn {
-60:             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-61:             color: white;
-62:             border: none;
-63:             padding: 12px 25px;
-64:             font-size: 1em;
-65:             border-radius: 25px;
-66:             cursor: pointer;
-67:             transition: all 0.3s ease;
-68:             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-69:             font-weight: bold;
-70:         }
-71: 
-72:         .mode-btn:hover {
-73:             transform: translateY(-2px);
-74:             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-75:         }
-76: 
-77:         .mode-btn.active {
-78:             background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-79:         }
-80: 
-81:         .difficulty-selector {
-82:             margin-top: 15px;
-83:             display: none;
-84:         }
-85: 
-86:         .difficulty-selector.visible {
-87:             display: block;
-88:         }
-89: 
-90:         .difficulty-btn {
-91:             background: #3498db;
-92:             color: white;
-93:             border: none;
-94:             padding: 8px 20px;
-95:             margin: 0 5px;
-96:             border-radius: 20px;
-97:             cursor: pointer;
-98:             transition: all 0.3s ease;
-99:         }
-100: 
-101:         .difficulty-btn:hover {
-102:             background: #2980b9;
-103:         }
-104: 
-105:         .difficulty-btn.active {
-106:             background: #e74c3c;
-107:         }
-108: 
-109:         .sound-toggle {
-110:             margin-top: 10px;
-111:         }
-112: 
-113:         .sound-btn {
-114:             background: #95a5a6;
-115:             color: white;
-116:             border: none;
-117:             padding: 8px 20px;
-118:             border-radius: 20px;
-119:             cursor: pointer;
-120:             transition: all 0.3s ease;
-121:         }
-122: 
-123:         .sound-btn.active {
-124:             background: #27ae60;
-125:         }
-126: 
-127:         .status {
-128:             font-size: 1.5em;
-129:             margin-bottom: 20px;
-130:             height: 40px;
-131:             font-weight: bold;
-132:             color: #555;
-133:         }
-134: 
-135:         .current-player {
-136:             display: inline-block;
-137:             width: 30px;
-138:             height: 30px;
-139:             border-radius: 50%;
-140:             vertical-align: middle;
-141:             margin-left: 10px;
-142:             border: 3px solid #333;
-143:         }
-144: 
-145:         .board {
-146:             display: inline-block;
-147:             background: #2563eb;
-148:             padding: 15px;
-149:             border-radius: 15px;
-150:             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-151:             margin-bottom: 20px;
-152:         }
-153: 
-154:         .row {
-155:             display: flex;
-156:             gap: 10px;
-157:             margin-bottom: 10px;
-158:         }
-159: 
-160:         .row:last-child {
-161:             margin-bottom: 0;
-162:         }
-163: 
-164:         .cell {
-165:             width: 70px;
-166:             height: 70px;
-167:             background: white;
-168:             border-radius: 50%;
-169:             cursor: pointer;
-170:             transition: all 0.3s ease;
-171:             position: relative;
-172:             box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.1);
-173:         }
-174: 
-175:         .cell:hover {
-176:             transform: scale(1.05);
-177:             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-178:         }
-179: 
-180:         .cell.red {
-181:             background: radial-gradient(circle at 30% 30%, #ff6b6b, #c92a2a);
-182:             box-shadow: 0 4px 8px rgba(201, 42, 42, 0.4);
-183:             animation: drop 0.5s ease;
-184:         }
-185: 
-186:         .cell.yellow {
-187:             background: radial-gradient(circle at 30% 30%, #ffd93d, #f5a623);
-188:             box-shadow: 0 4px 8px rgba(245, 166, 35, 0.4);
-189:             animation: drop 0.5s ease;
-190:         }
-191: 
-192:         .cell.winning {
-193:             animation: winning-pulse 1s ease-in-out infinite;
-194:         }
-195: 
-196:         .cell.ai-thinking {
-197:             background: #e8f4f8;
-198:             animation: thinking 1s ease-in-out infinite;
-199:         }
-200: 
-201:         @keyframes drop {
-202:             0% {
-203:                 transform: translateY(-500px);
-204:                 opacity: 0;
-205:             }
-206:             60% {
-207:                 transform: translateY(10px);
-208:             }
-209:             80% {
-210:                 transform: translateY(-5px);
-211:             }
-212:             100% {
-213:                 transform: translateY(0);
-214:                 opacity: 1;
-215:             }
-216:         }
-217: 
-218:         @keyframes winning-pulse {
-219:             0%, 100% {
-220:                 transform: scale(1);
-221:                 box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-222:             }
-223:             50% {
-224:                 transform: scale(1.1);
-225:                 box-shadow: 0 0 40px rgba(255, 215, 0, 1);
-226:             }
-227:         }
-228: 
-229:         @keyframes thinking {
-230:             0%, 100% {
-231:                 opacity: 0.3;
-232:             }
-233:             50% {
-234:                 opacity: 0.7;
-235:             }
-236:         }
-237: 
-238:         .controls {
-239:             margin-top: 20px;
-240:         }
-241: 
-242:         button.reset-btn {
-243:             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-244:             color: white;
-245:             border: none;
-246:             padding: 15px 40px;
-247:             font-size: 1.2em;
-248:             border-radius: 50px;
-249:             cursor: pointer;
-250:             transition: all 0.3s ease;
-251:             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-252:             font-weight: bold;
-253:         }
-254: 
-255:         button.reset-btn:hover {
-256:             transform: translateY(-2px);
-257:             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-258:         }
-259: 
-260:         button.reset-btn:active {
-261:             transform: translateY(0);
-262:         }
-263: 
-264:         .winner-message {
-265:             font-size: 1.8em;
-266:             color: #2ecc71;
-267:             font-weight: bold;
-268:             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-269:         }
-270: 
-271:         @media (max-width: 600px) {
-272:             .cell {
-273:                 width: 50px;
-274:                 height: 50px;
-275:             }
-276:             
-277:             h1 {
-278:                 font-size: 2em;
-279:             }
-280:         }
-281:     </style>
-282:     <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect 4 - Retro Arcade</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a0033 0%, #000033 100%);
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #fff;
+        }
+        
+        .game-container {
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff; }
+            to { text-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff; }
+        }
+        
+        #gameCanvas {
+            border: 4px solid #00ffff;
+            box-shadow: 0 0 30px #00ffff, inset 0 0 30px rgba(0, 255, 255, 0.1);
+            background: #000;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        
+        .controls {
+            margin: 20px 0;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+            border: 3px solid #fff;
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            margin: 10px;
+            text-shadow: 2px 2px 4px #000;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+        }
+        
+        .status {
+            font-size: 1.5em;
+            margin: 10px 0;
+            min-height: 40px;
+            text-shadow: 0 0 10px #00ffff;
+        }
+        
+        .mode-selector {
+            margin: 20px 0;
+        }
+        
+        .mode-btn {
+            padding: 10px 20px;
+            font-size: 1em;
+        }
+        
+        .mode-btn.active {
+            background: linear-gradient(135deg, #00ff00 0%, #00ffff 100%);
+        }
+    </style>
 </head>
-283: <body>
-284:     <div class="game-container">
-285:         <h1>🎮 Connect 4</h1>
-286:         
-287:         <div class="game-mode-selector">
-288:             <h3>Select Game Mode</h3>
-289:             <div class="mode-buttons">
-290:                 <button class="mode-btn active" id="pvpBtn">👥 Player vs Player</button>
-291:                 <button class="mode-btn" id="pvcBtn">🤖 Player vs AI</button>
-292:             </div>
-293:             
-294:             <div class="difficulty-selector" id="difficultySelector">
-295:                 <p style="margin: 10px 0; color: #666;">AI Difficulty:</p>
-296:                 <button class="difficulty-btn active" data-level="easy">Easy</button>
-297:                 <button class="difficulty-btn" data-level="medium">Medium</button>
-298:                 <button class="difficulty-btn" data-level="hard">Hard</button>
-299:             </div>
-300: 
-301:             <div class="sound-toggle">
-302:                 <button class="sound-btn active" id="soundBtn">🔊 Sound ON</button>
-303:             </div>
-304:         </div>
-305: 
-306:         <div class="status" id="status">
-307:             Current Player: <span class="current-player red"></span>
-308:         </div>
-309:         <div class="board" id="board"></div>
-310:         <div class="controls">
-311:             <button class="reset-btn" id="resetBtn">New Game</button>
-312:         </div>
-313:     </div>
-314: 
-315:     <script>
-316:         // Sound effects using Web Audio API
-317:         class SoundEffects {
-318:             constructor() {
-319:                 this.enabled = true;
-320:                 this.audioContext = null;
-321:                 this.initAudio();
-322:             }
-323: 
-324:             initAudio() {
-325:                 try {
-326:                     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-327:                 } catch (e) {
-328:                     console.log('Web Audio API not supported');
-329:                 }
-330:             }
-331: 
-332:             playDrop() {
-333:                 if (!this.enabled || !this.audioContext) return;
-334:                 
-335:                 const oscillator = this.audioContext.createOscillator();
-336:                 const gainNode = this.audioContext.createGain();
-337:                 
-338:                 oscillator.connect(gainNode);
-339:                 gainNode.connect(this.audioContext.destination);
-340:                 
-341:                 oscillator.frequency.value = 300;
-342:                 oscillator.type = 'sine';
-343:                 
-344:                 gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
-345:                 gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
-346:                 
-347:                 oscillator.start(this.audioContext.currentTime);
-348:                 oscillator.stop(this.audioContext.currentTime + 0.3);
-349:             }
-350: 
-351:             playWin() {
-352:                 if (!this.enabled || !this.audioContext) return;
-353:                 
-354:                 const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-355:                 notes.forEach((freq, i) => {
-356:                     const oscillator = this.audioContext.createOscillator();
-357:                     const gainNode = this.audioContext.createGain();
-358:                     
-359:                     oscillator.connect(gainNode);
-360:                     gainNode.connect(this.audioContext.destination);
-361:                     
-362:                     oscillator.frequency.value = freq;
-363:                     oscillator.type = 'triangle';
-364:                     
-365:                     const startTime = this.audioContext.currentTime + (i * 0.15);
-366:                     gainNode.gain.setValueAtTime(0.2, startTime);
-367:                     gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.3);
-368:                     
-369:                     oscillator.start(startTime);
-370:                     oscillator.stop(startTime + 0.3);
-371:                 });
-372:             }
-373: 
-374:             playError() {
-375:                 if (!this.enabled || !this.audioContext) return;
-376:                 
-377:                 const oscillator = this.audioContext.createOscillator();
-378:                 const gainNode = this.audioContext.createGain();
-379:                 
-380:                 oscillator.connect(gainNode);
-381:                 gainNode.connect(this.audioContext.destination);
-382:                 
-383:                 oscillator.frequency.value = 150;
-384:                 oscillator.type = 'sawtooth';
-385:                 
-386:                 gainNode.gain.setValueAtTime(0.2, this.audioContext.currentTime);
-387:                 gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
-388:                 
-389:                 oscillator.start(this.audioContext.currentTime);
-390:                 oscillator.stop(this.audioContext.currentTime + 0.2);
-391:             }
-392: 
-393:             toggle() {
-394:                 this.enabled = !this.enabled;
-395:                 return this.enabled;
-396:             }
-397:         }
-398: 
-399:         class Connect4AI {
-400:             constructor(difficulty = 'medium') {
-401:                 this.difficulty = difficulty;
-402:             }
-403: 
-404:             getMove(board, player) {
-405:                 const opponent = player === 'red' ? 'yellow' : 'red';
-406:                 
-407:                 // Check for winning move
-408:                 for (let col = 0; col < 7; col++) {
-409:                     if (this.canWin(board, col, player)) {
-410:                         return col;
-411:                     }
-412:                 }
-413:                 
-414:                 // Block opponent's winning move
-415:                 for (let col = 0; col < 7; col++) {
-416:                     if (this.canWin(board, col, opponent)) {
-417:                         return col;
-418:                     }
-419:                 }
-420:                 
-421:                 if (this.difficulty === 'easy') {
-422:                     return this.getRandomMove(board);
-423:                 } else if (this.difficulty === 'medium') {
-424:                     return this.getMediumMove(board, player);
-425:                 } else {
-426:                     return this.getHardMove(board, player);
-427:                 }
-428:             }
-429: 
-430:             canWin(board, col, player) {
-431:                 const row = this.getLowestEmptyRow(board, col);
-432:                 if (row === -1) return false;
-433:                 
-434:                 board[row][col] = player;
-435:                 const wins = this.checkWin(board, row, col);
-436:                 board[row][col] = null;
-437:                 
-438:                 return wins;
-439:             }
-440: 
-441:             getLowestEmptyRow(board, col) {
-442:                 for (let row = 5; row >= 0; row--) {
-443:                     if (board[row][col] === null) {
-444:                         return row;
-445:                     }
-446:                 }
-447:                 return -1;
-448:             }
-449: 
-450:             checkWin(board, row, col) {
-451:                 const player = board[row][col];
-452:                 return this.checkDirection(board, row, col, 0, 1, player) ||
-453:                        this.checkDirection(board, row, col, 1, 0, player) ||
-454:                        this.checkDirection(board, row, col, 1, 1, player) ||
-455:                        this.checkDirection(board, row, col, 1, -1, player);
-456:             }
-457: 
-458:             checkDirection(board, row, col, deltaRow, deltaCol, player) {
-459:                 let count = 1;
-460:                 
-461:                 for (let i = 1; i < 4; i++) {
-462:                     const newRow = row + (deltaRow * i);
-463:                     const newCol = col + (deltaCol * i);
-464:                     if (this.isValidCell(newRow, newCol) && board[newRow][newCol] === player) {
-465:                         count++;
-466:                     } else break;
-467:                 }
-468:                 
-469:                 for (let i = 1; i < 4; i++) {
-470:                     const newRow = row - (deltaRow * i);
-471:                     const newCol = col - (deltaCol * i);
-472:                     if (this.isValidCell(newRow, newCol) && board[newRow][newCol] === player) {
-473:                         count++;
-474:                     } else break;
-475:                 }
-476:                 
-477:                 return count >= 4;
-478:             }
-479: 
-480:             isValidCell(row, col) {
-481:                 return row >= 0 && row < 6 && col >= 0 && col < 7;
-482:             }
-483: 
-484:             getRandomMove(board) {
-485:                 const validMoves = [];
-486:                 for (let col = 0; col < 7; col++) {
-487:                     if (this.getLowestEmptyRow(board, col) !== -1) {
-488:                         validMoves.push(col);
-489:                     }
-490:                 }
-491:                 return validMoves[Math.floor(Math.random() * validMoves.length)];
-492:             }
-493: 
-494:             getMediumMove(board, player) {
-495:                 // Prefer center columns
-496:                 const centerCols = [3, 2, 4, 1, 5, 0, 6];
-497:                 for (const col of centerCols) {
-498:                     if (this.getLowestEmptyRow(board, col) !== -1) {
-499:                         if (Math.random() > 0.3) {
-500:                             return col;
-501:                         }
-502:                     }
-503:                 }
-504:                 return this.getRandomMove(board);
-505:             }
-506: 
-507:             getHardMove(board, player) {
-508:                 const opponent = player === 'red' ? 'yellow' : 'red';
-509:                 
-510:                 // Look for moves that create multiple threats
-511:                 let bestCol = 3;
-512:                 let bestScore = -1;
-513:                 
-514:                 for (let col = 0; col < 7; col++) {
-515:                     const row = this.getLowestEmptyRow(board, col);
-516:                     if (row === -1) continue;
-517:                     
-518:                     board[row][col] = player;
-519:                     const score = this.evaluatePosition(board, player, opponent);
-520:                     board[row][col] = null;
-521:                     
-522:                     if (score > bestScore) {
-523:                         bestScore = score;
-524:                         bestCol = col;
-525:                     }
-526:                 }
-527:                 
-528:                 return bestCol;
-529:             }
-530: 
-531:             evaluatePosition(board, player, opponent) {
-532:                 let score = 0;
-533:                 
-534:                 // Evaluate center control
-535:                 for (let row = 0; row < 6; row++) {
-536:                     if (board[row][3] === player) score += 3;
-537:                 }
-538:                 
-539:                 // Count potential wins
-540:                 for (let row = 0; row < 6; row++) {
-541:                     for (let col = 0; col < 7; col++) {
-542:                         if (board[row][col] === player) {
-543:                             score += this.countThreats(board, row, col, player);
-544:                         }
-545:                     }
-546:                 }
-547:                 
-548:                 return score;
-549:             }
-550: 
-551:             countThreats(board, row, col, player) {
-552:                 let threats = 0;
-553:                 const directions = [[0,1], [1,0], [1,1], [1,-1]];
-554:                 
-555:                 for (const [dr, dc] of directions) {
-556:                     let count = 1;
-557:                     let empty = 0;
-558:                     
-559:                     for (let i = 1; i < 4; i++) {
-560:                         const r = row + dr * i;
-561:                         const c = col + dc * i;
-562:                         if (!this.isValidCell(r, c)) break;
-563:                         if (board[r][c] === player) count++;
-564:                         else if (board[r][c] === null) empty++;
-565:                         else break;
-566:                     }
-567:                     
-568:                     if (count + empty >= 4) threats += count;
-569:                 }
-570:                 
-571:                 return threats;
-572:             }
-573:         }
-574: 
-575:         class Connect4 {
-576:             constructor() {
-577:                 this.rows = 6;
-578:                 this.cols = 7;
-579:                 this.board = Array(this.rows).fill(null).map(() => Array(this.cols).fill(null));
-580:                 this.currentPlayer = 'red';
-581:                 this.gameOver = false;
-582:                 this.winningCells = [];
-583:                 this.gameMode = 'pvp'; // 'pvp' or 'pvc'
-584:                 this.aiDifficulty = 'easy';
-585:                 this.ai = new Connect4AI(this.aiDifficulty);
-586:                 this.sounds = new SoundEffects();
-587:                 this.aiThinking = false;
-588:                 this.initBoard();
-589:                 this.updateStatus();
-590:             }
-591: 
-592:             initBoard() {
-593:                 const boardElement = document.getElementById('board');
-594:                 boardElement.innerHTML = '';
-595:                 
-596:                 for (let row = 0; row < this.rows; row++) {
-597:                     const rowDiv = document.createElement('div');
-598:                     rowDiv.className = 'row';
-599:                     
-600:                     for (let col = 0; col < this.cols; col++) {
-601:                         const cell = document.createElement('div');
-602:                         cell.className = 'cell';
-603:                         cell.dataset.row = row;
-604:                         cell.dataset.col = col;
-605:                         cell.addEventListener('click', () => this.handleClick(col));
-606:                         rowDiv.appendChild(cell);
-607:                     }
-608:                     
-609:                     boardElement.appendChild(rowDiv);
-610:                 }
-611:             }
-612: 
-613:             async handleClick(col) {
-614:                 if (this.gameOver || this.aiThinking) return;
-615:                 if (this.gameMode === 'pvc' && this.currentPlayer === 'yellow') return;
-616: 
-617:                 const row = this.getLowestEmptyRow(col);
-618:                 if (row === -1) {
-619:                     this.sounds.playError();
-620:                     return;
-621:                 }
-622: 
-623:                 this.makeMove(row, col);
-624: 
-625:                 if (!this.gameOver && this.gameMode === 'pvc' && this.currentPlayer === 'yellow') {
-626:                     await this.makeAIMove();
-627:                 }
-628:             }
-629: 
-630:             makeMove(row, col) {
-631:                 this.board[row][col] = this.currentPlayer;
-632:                 this.updateCell(row, col);
-633:                 this.sounds.playDrop();
-634: 
-635:                 if (this.checkWin(row, col)) {
-636:                     this.gameOver = true;
-637:                     this.highlightWinningCells();
-638:                     this.sounds.playWin();
-639:                     const winner = this.currentPlayer === 'red' ? 'RED' : 'YELLOW';
-640:                     const winMsg = this.gameMode === 'pvc' && this.currentPlayer === 'yellow' ? 
-641:                         '🤖 AI WINS! 🤖' : `🎉 ${winner} WINS! 🎉`;
-642:                     this.updateStatus(winMsg);
-643:                 } else if (this.isBoardFull()) {
-644:                     this.gameOver = true;
-645:                     this.updateStatus("🤝 It's a Draw!");
-646:                 } else {
-647:                     this.currentPlayer = this.currentPlayer === 'red' ? 'yellow' : 'red';
-648:                     this.updateStatus();
-649:                 }
-650:             }
-651: 
-652:             async makeAIMove() {
-653:                 this.aiThinking = true;
-654:                 this.updateStatus('🤖 AI is thinking...');
-655:                 
-656:                 // Add delay for realism
-657:                 await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
-658:                 
-659:                 const aiCol = this.ai.getMove(this.board, this.currentPlayer);
-660:                 const aiRow = this.getLowestEmptyRow(aiCol);
-661:                 
-662:                 this.aiThinking = false;
-663:                 
-664:                 if (aiRow !== -1) {
-665:                     this.makeMove(aiRow, aiCol);
-666:                 }
-667:             }
-668: 
-669:             getLowestEmptyRow(col) {
-670:                 for (let row = this.rows - 1; row >= 0; row--) {
-671:                     if (this.board[row][col] === null) {
-672:                         return row;
-673:                     }
-674:                 }
-675:                 return -1;
-676:             }
-677: 
-678:             updateCell(row, col) {
-679:                 const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-680:                 cell.classList.add(this.currentPlayer);
-681:             }
-682: 
-683:             checkWin(row, col) {
-684:                 return this.checkDirection(row, col, 0, 1) ||
-685:                        this.checkDirection(row, col, 1, 0) ||
-686:                        this.checkDirection(row, col, 1, 1) ||
-687:                        this.checkDirection(row, col, 1, -1);
-688:             }
-689: 
-690:             checkDirection(row, col, deltaRow, deltaCol) {
-691:                 const player = this.board[row][col];
-692:                 let count = 1;
-693:                 let cells = [[row, col]];
-694: 
-695:                 for (let i = 1; i < 4; i++) {
-696:                     const newRow = row + (deltaRow * i);
-697:                     const newCol = col + (deltaCol * i);
-698:                     if (this.isValidCell(newRow, newCol) && this.board[newRow][newCol] === player) {
-699:                         count++;
-700:                         cells.push([newRow, newCol]);
-701:                     } else break;
-702:                 }
-703: 
-704:                 for (let i = 1; i < 4; i++) {
-705:                     const newRow = row - (deltaRow * i);
-706:                     const newCol = col - (deltaCol * i);
-707:                     if (this.isValidCell(newRow, newCol) && this.board[newRow][newCol] === player) {
-708:                         count++;
-709:                         cells.push([newRow, newCol]);
-710:                     } else break;
-711:                 }
-712: 
-713:                 if (count >= 4) {
-714:                     this.winningCells = cells;
-715:                     return true;
-716:                 }
-717:                 return false;
-718:             }
-719: 
-720:             isValidCell(row, col) {
-721:                 return row >= 0 && row < this.rows && col >= 0 && col < this.cols;
-722:             }
-723: 
-724:             isBoardFull() {
-725:                 return this.board[0].every(cell => cell !== null);
-726:             }
-727: 
-728:             highlightWinningCells() {
-729:                 this.winningCells.forEach(([row, col]) => {
-730:                     const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-731:                     cell.classList.add('winning');
-732:                 });
-733:             }
-734: 
-735:             updateStatus(message = null) {
-736:                 const statusElement = document.getElementById('status');
-737:                 if (message) {
-738:                     statusElement.innerHTML = `<span class="winner-message">${message}</span>`;
-739:                 } else {
-740:                     const colorClass = this.currentPlayer;
-741:                     const playerName = this.gameMode === 'pvc' && this.currentPlayer === 'yellow' ? 
-742:                         'AI 🤖' : `<span class="current-player ${colorClass}"></span>`;
-743:                     statusElement.innerHTML = `Current Player: ${playerName}`;
-744:                 }
-745:             }
-746: 
-747:             setGameMode(mode) {
-748:                 this.gameMode = mode;
-749:                 this.reset();
-750:             }
-751: 
-752:             setAIDifficulty(difficulty) {
-753:                 this.aiDifficulty = difficulty;
-754:                 this.ai = new Connect4AI(difficulty);
-755:             }
-756: 
-757:             reset() {
-758:                 this.board = Array(this.rows).fill(null).map(() => Array(this.cols).fill(null));
-759:                 this.currentPlayer = 'red';
-760:                 this.gameOver = false;
-761:                 this.winningCells = [];
-762:                 this.aiThinking = false;
-763:                 this.initBoard();
-764:                 this.updateStatus();
-765:             }
-766:         }
-767: 
-768:         // Initialize game
-769:         let game = new Connect4();
-770: 
-771:         // Game mode buttons
-772:         document.getElementById('pvpBtn').addEventListener('click', function() {
-773:             document.getElementById('pvpBtn').classList.add('active');
-774:             document.getElementById('pvcBtn').classList.remove('active');
-775:             document.getElementById('difficultySelector').classList.remove('visible');
-776:             game.setGameMode('pvp');
-777:         });
-778: 
-779:         document.getElementById('pvcBtn').addEventListener('click', function() {
-780:             document.getElementById('pvcBtn').classList.add('active');
-781:             document.getElementById('pvpBtn').classList.remove('active');
-782:             document.getElementById('difficultySelector').classList.add('visible');
-783:             game.setGameMode('pvc');
-784:         });
-785: 
-786:         // Difficulty buttons
-787:         document.querySelectorAll('.difficulty-btn').forEach(btn => {
-788:             btn.addEventListener('click', function() {
-789:                 document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
-790:                 this.classList.add('active');
-791:                 game.setAIDifficulty(this.dataset.level);
-792:                 game.reset();
-793:             });
-794:         });
-795: 
-796:         // Sound toggle
-797:         document.getElementById('soundBtn').addEventListener('click', function() {
-798:             const enabled = game.sounds.toggle();
-799:             this.classList.toggle('active', enabled);
-800:             this.textContent = enabled ? '🔊 Sound ON' : '🔇 Sound OFF';
-801:         });
-802: 
-803:         // Reset button
-804:         document.getElementById('resetBtn').addEventListener('click', () => {
-805:             game.reset();
-806:         });
-807:     </script>
-808: </body>
-809: </html>
-```
+<body>
+    <div class="game-container">
+        <h1>🔴 CONNECT 4 🟡</h1>
+        
+        <div class="mode-selector">
+            <button class="mode-btn active" id="pvpBtn">Player vs Player</button>
+            <button class="mode-btn" id="aiBtn">Player vs AI</button>
+        </div>
+        
+        <div class="status" id="status">Red's Turn</div>
+        
+        <canvas id="gameCanvas" width="700" height="600"></canvas>
+        
+        <div class="controls">
+            <button id="resetBtn">New Game</button>
+            <button id="backBtn">Back to Menu</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const statusEl = document.getElementById('status');
+        const resetBtn = document.getElementById('resetBtn');
+        const backBtn = document.getElementById('backBtn');
+        const pvpBtn = document.getElementById('pvpBtn');
+        const aiBtn = document.getElementById('aiBtn');
+        
+        const ROWS = 6;
+        const COLS = 7;
+        const CELL_SIZE = 90;
+        const PADDING = 20;
+        const DISC_RADIUS = 35;
+        
+        let board = [];
+        let currentPlayer = 1;
+        let gameOver = false;
+        let aiMode = false;
+        let animatingDisc = null;
+        
+        function initBoard() {
+            board = [];
+            for (let r = 0; r < ROWS; r++) {
+                board[r] = [];
+                for (let c = 0; c < COLS; c++) {
+                    board[r][c] = 0;
+                }
+            }
+            currentPlayer = 1;
+            gameOver = false;
+            animatingDisc = null;
+            updateStatus();
+        }
+        
+        function drawBoard() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#00ffff';
+            ctx.lineWidth = 2;
+            for (let c = 0; c <= COLS; c++) {
+                ctx.beginPath();
+                ctx.moveTo(PADDING + c * CELL_SIZE, PADDING);
+                ctx.lineTo(PADDING + c * CELL_SIZE, PADDING + ROWS * CELL_SIZE);
+                ctx.stroke();
+            }
+            for (let r = 0; r <= ROWS; r++) {
+                ctx.beginPath();
+                ctx.moveTo(PADDING, PADDING + r * CELL_SIZE);
+                ctx.lineTo(PADDING + COLS * CELL_SIZE, PADDING + r * CELL_SIZE);
+                ctx.stroke();
+            }
+            
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    const x = PADDING + c * CELL_SIZE + CELL_SIZE / 2;
+                    const y = PADDING + r * CELL_SIZE + CELL_SIZE / 2;
+                    
+                    if (board[r][c] === 1) {
+                        drawDisc(x, y, '#ff0000', '#ff6666');
+                    } else if (board[r][c] === 2) {
+                        drawDisc(x, y, '#ffff00', '#ffff99');
+                    } else {
+                        ctx.fillStyle = '#1a1a1a';
+                        ctx.beginPath();
+                        ctx.arc(x, y, DISC_RADIUS, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
+            
+            if (animatingDisc) {
+                const x = PADDING + animatingDisc.col * CELL_SIZE + CELL_SIZE / 2;
+                const color = animatingDisc.player === 1 ? '#ff0000' : '#ffff00';
+                const highlight = animatingDisc.player === 1 ? '#ff6666' : '#ffff99';
+                drawDisc(x, animatingDisc.y, color, highlight);
+            }
+        }
+        
+        function drawDisc(x, y, color, highlight) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.beginPath();
+            ctx.arc(x + 3, y + 3, DISC_RADIUS, 0, Math.PI * 2);
+            ctx.fill();
+            
+            const gradient = ctx.createRadialGradient(x - 10, y - 10, 5, x, y, DISC_RADIUS);
+            gradient.addColorStop(0, highlight);
+            gradient.addColorStop(1, color);
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(x, y, DISC_RADIUS, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.beginPath();
+            ctx.arc(x - 12, y - 12, 12, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        function getColumn(mouseX) {
+            const x = mouseX - canvas.getBoundingClientRect().left;
+            const col = Math.floor((x - PADDING) / CELL_SIZE);
+            return col >= 0 && col < COLS ? col : -1;
+        }
+        
+        function dropDisc(col) {
+            if (gameOver || animatingDisc) return;
+            
+            let row = -1;
+            for (let r = ROWS - 1; r >= 0; r--) {
+                if (board[r][col] === 0) {
+                    row = r;
+                    break;
+                }
+            }
+            
+            if (row === -1) return;
+            
+            animatingDisc = {
+                col: col,
+                row: row,
+                y: PADDING,
+                targetY: PADDING + row * CELL_SIZE + CELL_SIZE / 2,
+                player: currentPlayer,
+                velocity: 0
+            };
+            
+            animateDrop();
+        }
+        
+        function animateDrop() {
+            if (!animatingDisc) return;
+            
+            const gravity = 0.8;
+            const bounce = 0.5;
+            
+            animatingDisc.velocity += gravity;
+            animatingDisc.y += animatingDisc.velocity;
+            
+            if (animatingDisc.y >= animatingDisc.targetY) {
+                animatingDisc.y = animatingDisc.targetY;
+                
+                if (Math.abs(animatingDisc.velocity) > 1) {
+                    animatingDisc.velocity = -animatingDisc.velocity * bounce;
+                } else {
+                    board[animatingDisc.row][animatingDisc.col] = animatingDisc.player;
+                    const winner = checkWin(animatingDisc.row, animatingDisc.col);
+                    animatingDisc = null;
+                    
+                    if (winner) {
+                        gameOver = true;
+                        statusEl.textContent = winner === 1 ? '🎉 Red Wins! 🎉' : '🎉 Yellow Wins! 🎉';
+                        statusEl.style.animation = 'glow 0.5s ease-in-out infinite alternate';
+                    } else if (isBoardFull()) {
+                        gameOver = true;
+                        statusEl.textContent = "It's a Draw!";
+                    } else {
+                        currentPlayer = currentPlayer === 1 ? 2 : 1;
+                        updateStatus();
+                        
+                        if (aiMode && currentPlayer === 2 && !gameOver) {
+                            setTimeout(makeAIMove, 500);
+                        }
+                    }
+                    return;
+                }
+            }
+            
+            drawBoard();
+            requestAnimationFrame(animateDrop);
+        }
+        
+        function makeAIMove() {
+            if (gameOver || animatingDisc) return;
+            
+            let bestCol = -1;
+            
+            for (let c = 0; c < COLS; c++) {
+                const r = getLowestEmptyRow(c);
+                if (r !== -1) {
+                    board[r][c] = 2;
+                    if (checkWin(r, c)) {
+                        bestCol = c;
+                        board[r][c] = 0;
+                        break;
+                    }
+                    board[r][c] = 0;
+                }
+            }
+            
+            if (bestCol === -1) {
+                for (let c = 0; c < COLS; c++) {
+                    const r = getLowestEmptyRow(c);
+                    if (r !== -1) {
+                        board[r][c] = 1;
+                        if (checkWin(r, c)) {
+                            bestCol = c;
+                            board[r][c] = 0;
+                            break;
+                        }
+                        board[r][c] = 0;
+                    }
+                }
+            }
+            
+            if (bestCol === -1) {
+                const availableCols = [];
+                for (let c = 0; c < COLS; c++) {
+                    if (board[0][c] === 0) availableCols.push(c);
+                }
+                if (availableCols.length > 0) {
+                    bestCol = availableCols[Math.floor(Math.random() * availableCols.length)];
+                }
+            }
+            
+            if (bestCol !== -1) {
+                dropDisc(bestCol);
+            }
+        }
+        
+        function getLowestEmptyRow(col) {
+            for (let r = ROWS - 1; r >= 0; r--) {
+                if (board[r][col] === 0) return r;
+            }
+            return -1;
+        }
+        
+        function checkWin(row, col) {
+            const player = board[row][col];
+            if (player === 0) return false;
+            
+            let count = 1;
+            for (let c = col - 1; c >= 0 && board[row][c] === player; c--) count++;
+            for (let c = col + 1; c < COLS && board[row][c] === player; c++) count++;
+            if (count >= 4) return player;
+            
+            count = 1;
+            for (let r = row - 1; r >= 0 && board[r][col] === player; r--) count++;
+            for (let r = row + 1; r < ROWS && board[r][col] === player; r++) count++;
+            if (count >= 4) return player;
+            
+            count = 1;
+            for (let i = 1; row - i >= 0 && col - i >= 0 && board[row - i][col - i] === player; i++) count++;
+            for (let i = 1; row + i < ROWS && col + i < COLS && board[row + i][col + i] === player; i++) count++;
+            if (count >= 4) return player;
+            
+            count = 1;
+            for (let i = 1; row - i >= 0 && col + i < COLS && board[row - i][col + i] === player; i++) count++;
+            for (let i = 1; row + i < ROWS && col - i >= 0 && board[row + i][col - i] === player; i++) count++;
+            if (count >= 4) return player;
+            
+            return false;
+        }
+        
+        function isBoardFull() {
+            for (let c = 0; c < COLS; c++) {
+                if (board[0][c] === 0) return false;
+            }
+            return true;
+        }
+        
+        function updateStatus() {
+            if (!gameOver) {
+                statusEl.style.animation = 'none';
+                if (aiMode && currentPlayer === 2) {
+                    statusEl.textContent = "AI is thinking...";
+                } else {
+                    statusEl.textContent = currentPlayer === 1 ? "🔴 Red's Turn" : "🟡 Yellow's Turn";
+                }
+            }
+        }
+        
+        canvas.addEventListener('click', (e) => {
+            if (!gameOver && !animatingDisc && (!aiMode || currentPlayer === 1)) {
+                const col = getColumn(e.clientX);
+                if (col !== -1) {
+                    dropDisc(col);
+                }
+            }
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (!gameOver && !animatingDisc && (!aiMode || currentPlayer === 1)) {
+                const col = getColumn(e.clientX);
+                canvas.style.opacity = col !== -1 ? '1' : '0.8';
+            }
+        });
+        
+        resetBtn.addEventListener('click', () => {
+            initBoard();
+            drawBoard();
+        });
+        
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+        
+        pvpBtn.addEventListener('click', () => {
+            aiMode = false;
+            pvpBtn.classList.add('active');
+            aiBtn.classList.remove('active');
+            initBoard();
+            drawBoard();
+        });
+        
+        aiBtn.addEventListener('click', () => {
+            aiMode = true;
+            aiBtn.classList.add('active');
+            pvpBtn.classList.remove('active');
+            initBoard();
+            drawBoard();
+        });
+        
+        initBoard();
+        drawBoard();
+        
+        function gameLoop() {
+            if (!animatingDisc) {
+                drawBoard();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+        gameLoop();
+    </script>
+</body>
+</html>
