@@ -1,126 +1,133 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retro Arcade Games</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            text-align: center;
-            max-width: 1200px;
-            width: 100%;
-        }
-        
-        h1 {
-            color: #fff;
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 4px 4px 0px rgba(0,0,0,0.3);
-            letter-spacing: 3px;
-        }
-        
-        .subtitle {
-            color: #f0f0f0;
-            font-size: 1.2rem;
-            margin-bottom: 3rem;
-            opacity: 0.9;
-        }
-        
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-        
-        .game-card {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-        
-        .game-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-        }
-        
-        .game-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-        
-        .game-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-        
-        .game-description {
-            color: #666;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🕹️ RETRO ARCADE</h1>
-        <p class="subtitle">Choose Your Game</p>
-        
-        <div class="games-grid">
-            <a href="connect4.html" class="game-card">
-                <div class="game-icon">🔴</div>
-                <div class="game-title">Connect 4</div>
-                <div class="game-description">Classic strategy game. Connect four in a row to win!</div>
-            </a>
+### /Users/daviddodd/retro-arcade-games/index.html
+```html
+1: <!DOCTYPE html>
+2: <html lang="en">
+3: <head>
+4:     <meta charset="UTF-8">
+5:     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+6:     <title>Retro Arcade Games</title>
+7:     <style>
+8:         * {
+9:             margin: 0;
+10:             padding: 0;
+11:             box-sizing: border-box;
+12:         }
+13:         
+14:         body {
+15:             font-family: 'Courier New', monospace;
+16:             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+17:             min-height: 100vh;
+18:             display: flex;
+19:             justify-content: center;
+20:             align-items: center;
+21:             padding: 20px;
+22:         }
+23:         
+24:         .container {
+25:             text-align: center;
+26:             max-width: 1200px;
+27:             width: 100%;
+28:         }
+29:         
+30:         h1 {
+31:             color: #fff;
+32:             font-size: 3.5rem;
+33:             margin-bottom: 1rem;
+34:             text-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+35:             letter-spacing: 3px;
+36:         }
+37:         
+38:         .subtitle {
+39:             color: #f0f0f0;
+40:             font-size: 1.2rem;
+41:             margin-bottom: 3rem;
+42:             opacity: 0.9;
+43:         }
+44:         
+45:         .games-grid {
+46:             display: grid;
+47:             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+48:             gap: 2rem;
+49:             margin-top: 2rem;
+50:         }
+51:         
+52:         .game-card {
+53:             background: white;
+54:             border-radius: 15px;
+55:             padding: 2rem;
+56:             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+57:             transition: transform 0.3s, box-shadow 0.3s;
+58:             cursor: pointer;
+59:             text-decoration: none;
+60:             color: inherit;
+61:             display: block;
+62:         }
+63:         
+64:         .game-card:hover {
+65:             transform: translateY(-10px);
+66:             box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+67:         }
+68:         
+69:         .game-icon {
+70:             font-size: 4rem;
+71:             margin-bottom: 1rem;
+72:         }
+73:         
+74:         .game-title {
+75:             font-size: 1.5rem;
+76:             font-weight: bold;
+77:             color: #333;
+78:             margin-bottom: 0.5rem;
+79:         }
+80:         
+81:         .game-description {
+82:             color: #666;
+83:             font-size: 0.9rem;
+84:             line-height: 1.5;
+85:         }
+86:     </style>
+87: </head>
+88: <body>
+89:     <div class="container">
+90:         <h1>🕹️ RETRO ARCADE</h1>
+91:         <p class="subtitle">Choose Your Game</p>
+92:         
+93:         <div class="games-grid">
+94:             <a href="connect4.html" class="game-card">
+95:                 <div class="game-icon">🔴</div>
+96:                 <div class="game-title">Connect 4</div>
+97:                 <div class="game-description">Classic strategy game. Connect four in a row to win!</div>
+98:             </a>
+99:             
+100:             <a href="space-invaders.html" class="game-card">
+101:                 <div class="game-icon">👾</div>
+102:                 <div class="game-title">Space Invaders</div>
+103:                 <div class="game-description">Defend Earth from alien invaders!</div>
+104:             </a>
+105:             
+106:             <a href="pacman.html" class="game-card">
+107:                 <div class="game-icon">🟡</div>
+108:                 <div class="game-title">Pac-Man</div>
+109:                 <div class="game-description">Eat dots and avoid the ghosts!</div>
+110:             </a>
+111:             
+112:             <a href="snake.html" class="game-card">
+113:                 <div class="game-icon">🐍</div>
+114:                 <div class="game-title">Snake</div>
+115:                 <div class="game-description">Eat food and grow longer without hitting yourself!</div>
+116:             </a>
+117:             
+118:             <a href="tetris.html" class="game-card">
             
-            <a href="space-invaders.html" class="game-card">
-                <div class="game-icon">👾</div>
-                <div class="game-title">Space Invaders</div>
-                <div class="game-description">Defend Earth from alien invaders!</div>
+            <a href="asteroids.html" class="game-card">
+                <div class="game-icon">☄️</div>
+                <div class="game-title">Asteroids</div>
+                <div class="game-description">Destroy asteroids and avoid collisions in deep space!</div>
             </a>
-            
-            <a href="pacman.html" class="game-card">
-                <div class="game-icon">🟡</div>
-                <div class="game-title">Pac-Man</div>
-                <div class="game-description">Eat dots and avoid the ghosts!</div>
-            </a>
-            
-            <a href="snake.html" class="game-card">
-                <div class="game-icon">🐍</div>
-                <div class="game-title">Snake</div>
-                <div class="game-description">Eat food and grow longer without hitting yourself!</div>
-            </a>
-            
-            <a href="tetris.html" class="game-card">
-                <div class="game-icon">🎮</div>
-                <div class="game-title">Tetris</div>
-                <div class="game-description">Arrange falling blocks to clear lines!</div>
-            </a>
-        </div>
-    </div>
-</body>
-</html>
+122:             </a>
+123:         </div>
+124:     </div>
+125: </body>
+126: </html>
+```
+

@@ -1,105 +1,121 @@
-# 🕹️ Retro Arcade Games
-
-Classic arcade games collection built with vanilla JavaScript and HTML5 Canvas.
-
-## 🎮 Games Included
-
-### 🔴 Connect 4
-Classic two-player strategy game with AI opponent option. Connect four discs in a row (horizontal, vertical, or diagonal) to win!
+### /Users/daviddodd/retro-arcade-games/README.md
+```markdown
+1: # 🕹️ Retro Arcade Games
+2: 
+3: Classic arcade games collection built with vanilla JavaScript and HTML5 Canvas.
+4: 
+5: ## 🎮 Games Included
+6: 
+7: ### 🔴 Connect 4
+8: Classic two-player strategy game with AI opponent option. Connect four discs in a row (horizontal, vertical, or diagonal) to win!
+9: 
+10: **Features:**
+11: - Player vs Player mode
+12: - Player vs AI mode with smart opponent
+13: - Animated disc drops with physics
+14: - Win detection for all directions
+15: - Retro neon styling
+16: 
+17: ### 👾 Space Invaders
+18: Defend Earth from waves of alien invaders in this classic arcade shooter!
+19: 
+20: **Features:**
+21: - 55 aliens in formation (5 rows × 11 columns)
+22: - Three alien types with different point values
+23: - Player shooting mechanics
+24: - Alien projectiles
+25: - 4 destructible shields
+26: - Progressive difficulty (aliens speed up each level)
+27: - Score, lives, and level tracking
+28: 
+29: ### 🟡 Pac-Man
+30: Navigate the maze, eat dots, and avoid the colorful ghosts!
+31: 
+32: **Features:**
+33: - Full classic maze layout
+34: - Animated Pac-Man with chomping mouth
+35: - 4 AI-controlled ghosts (red, pink, cyan, orange)
+36: - Dots and power pellets
+37: - Power mode - eat ghosts for bonus points
+38: - Score system with lives
+39: - Arrow key controls
+40: 
+41: ### 🐍 Snake
+42: Classic snake game - eat food to grow longer, but don't hit yourself or the walls!
+43: 
+44: **Features:**
+45: - Smooth snake movement
+46: - Food spawning system
+47: - Score tracking with high score (saved to localStorage)
+48: - Progressive speed increase
+49: - Grid-based gameplay with glow effects
+50: - Arrow key controls
+51: 
+52: ### 🎮 Tetris
+53: Arrange falling tetrominoes to complete lines and rack up points!
+54: 
+55: **Features:**
+56: - All 7 classic tetromino shapes (I, O, T, L, J, S, Z)
+57: - Piece rotation
+58: - Next piece preview
+59: - Score, level, and lines tracking
+60: - Progressive speed increase
+61: - Hard drop functionality (Space bar)
+62: - Pause feature
+63: - Beautiful color-coded pieces
+64: 
+### ☄️ Asteroids
+Destroy asteroids and avoid collisions in this classic arcade space shooter!
 
 **Features:**
-- Player vs Player mode
-- Player vs AI mode with smart opponent
-- Animated disc drops with physics
-- Win detection for all directions
-- Retro neon styling
-
-### 👾 Space Invaders
-Defend Earth from waves of alien invaders in this classic arcade shooter!
-
-**Features:**
-- 55 aliens in formation (5 rows × 11 columns)
-- Three alien types with different point values
-- Player shooting mechanics
-- Alien projectiles
-- 4 destructible shields
-- Progressive difficulty (aliens speed up each level)
+- Ship rotation and thrust controls
+- Asteroids break into smaller pieces when hit
+- Screen wrapping (wrap around edges of screen)
+- Particle explosion effects
+- Progressive difficulty with levels
 - Score, lives, and level tracking
-
-### 🟡 Pac-Man
-Navigate the maze, eat dots, and avoid the colorful ghosts!
-
-**Features:**
-- Full classic maze layout
-- Animated Pac-Man with chomping mouth
-- 4 AI-controlled ghosts (red, pink, cyan, orange)
-- Dots and power pellets
-- Power mode - eat ghosts for bonus points
-- Score system with lives
-- Arrow key controls
-
-### 🐍 Snake
-Classic snake game - eat food to grow longer, but don't hit yourself or the walls!
-
-**Features:**
-- Smooth snake movement
-- Food spawning system
-- Score tracking with high score (saved to localStorage)
-- Progressive speed increase
-- Grid-based gameplay with glow effects
-- Arrow key controls
-
-### 🎮 Tetris
-Arrange falling tetrominoes to complete lines and rack up points!
-
-**Features:**
-- All 7 classic tetromino shapes (I, O, T, L, J, S, Z)
-- Piece rotation
-- Next piece preview
-- Score, level, and lines tracking
-- Progressive speed increase
-- Hard drop functionality (Space bar)
-- Pause feature
-- Beautiful color-coded pieces
+- Hyperspace jump feature
 
 ## 🚀 Getting Started
-
-Simply open `index.html` in your web browser to access the game menu and start playing!
-
-## 🎯 Controls
-
-### Connect 4
-- Click on columns to drop your disc
-
-### Space Invaders
-- Arrow Left/Right: Move ship
+66: 
+67: Simply open `index.html` in your web browser to access the game menu and start playing!
+68: 
+69: ## 🎯 Controls
+70: 
+71: ### Connect 4
+72: - Click on columns to drop your disc
+73: 
+74: ### Space Invaders
+75: - Arrow Left/Right: Move ship
+76: - Space: Shoot
+77: 
+78: ### Pac-Man
+79: - Arrow Keys: Move Pac-Man
+80: 
+81: ### Snake
+82: - Arrow Keys: Change direction
+83: - Game auto-starts on first arrow key press
+84: 
+85: ### Tetris
+### ☄️ Asteroids
+- Arrow Left/Right: Rotate ship
+- Arrow Up: Thrust forward
 - Space: Shoot
+- H: Hyperspace jump (when available)
 
-### Pac-Man
-- Arrow Keys: Move Pac-Man
+92: ## 🛠️ Technologies Used
+93: 
+94: - HTML5 Canvas for game rendering
+95: - Vanilla JavaScript for game logic
+96: - CSS3 for styling and animations
+97: - No external libraries or frameworks
+98: 
+99: ## 📝 License
+100: 
+101: MIT License - feel free to use and modify these games!
+102: 
+103: ---
+104: 
+105: Built with ❤️ for retro gaming enthusiasts
+```
 
-### Snake
-- Arrow Keys: Change direction
-- Game auto-starts on first arrow key press
-
-### Tetris
-- Arrow Left/Right: Move piece
-- Arrow Up: Rotate piece
-- Arrow Down: Soft drop
-- Space: Hard drop
-- P: Pause
-
-## 🛠️ Technologies Used
-
-- HTML5 Canvas for game rendering
-- Vanilla JavaScript for game logic
-- CSS3 for styling and animations
-- No external libraries or frameworks
-
-## 📝 License
-
-MIT License - feel free to use and modify these games!
-
----
-
-Built with ❤️ for retro gaming enthusiasts
