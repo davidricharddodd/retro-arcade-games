@@ -164,6 +164,10 @@
         let bullets = [];
         let asteroids = [];
         let particles = [];
+        let saucer = null;         // Flying saucer (large=1000pts, small=200pts in original)
+        let saucerTimer = 0;
+        let saucerBullets = [];
+        let saucerInterval = 600; // frames until next saucer
         
         // Input tracking
         const keys = {};
@@ -193,6 +197,8 @@
             bullets = [];
             asteroids = [];
             particles = [];
+            saucer = null; saucerTimer = 0; saucerBullets = [];
+            saucerInterval = 600;
             
             // Create initial asteroids
             createAsteroids(4 + level);
@@ -202,24 +208,42 @@
             requestAnimationFrame(gameLoop);
         }
         
+        // Pre-compute asteroid polygon vertices (fixes flickering)
+        function makeAsteroidVerts(numVerts) {
+            const verts = [];
+            for (let i = 0; i < numVerts; i++) {
+                const angle = (i / numVerts) * Math.PI * 2;
+                const r = 0.7 + Math.random() * 0.3; // irregular shape
+                verts.push({ cos: Math.cos(angle) * r, sin: Math.sin(angle) * r });
+            }
+            return verts;
+        }
+
+        function makeAsteroid(x, y, vx, vy, size, type) {
+            const numVerts = Math.floor(7 + Math.random() * 5);
+            return {
+                x, y, velocityX: vx, velocityY: vy,
+                rotation: Math.random() * Math.PI * 2,
+                rotationSpeed: (Math.random() - 0.5) * 0.03,
+                size, type,
+                verts: makeAsteroidVerts(numVerts)
+            };
+        }
+
         // Create asteroids
         function createAsteroids(count) {
             for (let i = 0; i < count; i++) {
-                const size = 40 + Math.random() * 20;
+                const size = 38 + Math.random() * 18;
                 const angle = Math.random() * Math.PI * 2;
                 const distance = Math.max(canvas.width, canvas.height) * 0.6;
-                
-                asteroids.push({
-                    x: canvas.width / 2 + Math.cos(angle) * distance,
-                    y: canvas.height / 2 + Math.sin(angle) * distance,
-                    velocityX: (Math.random() - 0.5) * 2,
-                    velocityY: (Math.random() - 0.5) * 2,
-                    rotation: Math.random() * Math.PI * 2,
-                    rotationSpeed: (Math.random() - 0.5) * 0.02,
-                    size: size,
-                    vertices: Math.floor(8 + Math.random() * 4),
-                    type: 'large'
-                });
+                const speed = 0.8 + Math.random() * 1.2;
+                asteroids.push(makeAsteroid(
+                    canvas.width / 2 + Math.cos(angle) * distance,
+                    canvas.height / 2 + Math.sin(angle) * distance,
+                    Math.cos(Math.random() * Math.PI * 2) * speed,
+                    Math.sin(Math.random() * Math.PI * 2) * speed,
+                    size, 'large'
+                ));
             }
         }
         
@@ -246,10 +270,13 @@
             
             // Update particles
             updateParticles();
-            
+
+            // Update saucer
+            updateSaucer();
+
             // Check collisions
             checkCollisions();
-            
+
             // Update invincibility timer
             if (player.invincible) {
                 player.invincibleTimer--;
@@ -257,10 +284,12 @@
                     player.invincible = false;
                 }
             }
-            
+
             // Level progression
             if (asteroids.length === 0) {
                 level++;
+                saucer = null; saucerBullets = [];
+                saucerTimer = 0; saucerInterval = Math.max(200, 600 - level * 30);
                 createAsteroids(4 + level);
                 updateDisplay();
             }
@@ -378,6 +407,65 @@
             }
         }
         
+        // Update flying saucer
+        function updateSaucer() {
+            saucerTimer++;
+            if (!saucer && saucerTimer >= saucerInterval) {
+                saucerTimer = 0;
+                // Alternate large (1000pts) and small (200pts) saucers; higher levels more small
+                const isSmall = level > 2 && Math.random() < 0.6;
+                const fromLeft = Math.random() < 0.5;
+                saucer = {
+                    x: fromLeft ? -20 : canvas.width + 20,
+                    y: 50 + Math.random() * (canvas.height - 100),
+                    vx: fromLeft ? 2.5 : -2.5,
+                    vy: 0,
+                    size: isSmall ? 12 : 22,
+                    points: isSmall ? 1000 : 200,
+                    shootTimer: 0,
+                    shootInterval: isSmall ? 60 : 90,
+                    changeTimer: 0
+                };
+            }
+            if (!saucer) return;
+
+            saucer.x += saucer.vx;
+            // Periodically change vertical direction (zigzag)
+            saucer.changeTimer++;
+            if (saucer.changeTimer > 80) {
+                saucer.vy = (Math.random() - 0.5) * 2;
+                saucer.changeTimer = 0;
+            }
+            saucer.y += saucer.vy;
+            saucer.y = Math.max(20, Math.min(canvas.height - 20, saucer.y));
+
+            // Remove if off screen
+            if (saucer.x < -40 || saucer.x > canvas.width + 40) { saucer = null; saucerBullets = []; return; }
+
+            // Shoot at player
+            saucer.shootTimer++;
+            if (saucer.shootTimer >= saucer.shootInterval) {
+                saucer.shootTimer = 0;
+                // Small saucer aims at player; large saucer shoots randomly
+                let angle;
+                if (saucer.points === 1000) {
+                    angle = Math.atan2(player.y - saucer.y, player.x - saucer.x) + (Math.random() - 0.5) * 0.4;
+                } else {
+                    angle = Math.random() * Math.PI * 2;
+                }
+                saucerBullets.push({ x: saucer.x, y: saucer.y, vx: Math.cos(angle) * 5, vy: Math.sin(angle) * 5, life: 100 });
+            }
+
+            // Update saucer bullets
+            for (let i = saucerBullets.length - 1; i >= 0; i--) {
+                const b = saucerBullets[i];
+                b.x += b.vx; b.y += b.vy; b.life--;
+                if (b.life <= 0 || b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
+                    saucerBullets.splice(i, 1);
+                }
+            }
+        }
+
         // Check collisions
         function checkCollisions() {
             // Bullet vs asteroid collisions
@@ -414,34 +502,22 @@
                         
                         // Break asteroid
                         if (asteroid.type === 'large') {
-                            // Create 2 medium asteroids
                             for (let k = 0; k < 2; k++) {
-                                asteroids.push({
-                                    x: asteroid.x,
-                                    y: asteroid.y,
-                                    velocityX: asteroid.velocityX + (Math.random() - 0.5) * 2,
-                                    velocityY: asteroid.velocityY + (Math.random() - 0.5) * 2,
-                                    rotation: Math.random() * Math.PI * 2,
-                                    rotationSpeed: (Math.random() - 0.5) * 0.03,
-                                    size: asteroid.size * 0.6,
-                                    vertices: Math.floor(6 + Math.random() * 3),
-                                    type: 'medium'
-                                });
+                                const spd = 1.2 + Math.random() * 1.2;
+                                const ang = Math.random() * Math.PI * 2;
+                                asteroids.push(makeAsteroid(asteroid.x, asteroid.y,
+                                    asteroid.velocityX + Math.cos(ang) * spd,
+                                    asteroid.velocityY + Math.sin(ang) * spd,
+                                    asteroid.size * 0.55, 'medium'));
                             }
                         } else if (asteroid.type === 'medium') {
-                            // Create 2 small asteroids
                             for (let k = 0; k < 2; k++) {
-                                asteroids.push({
-                                    x: asteroid.x,
-                                    y: asteroid.y,
-                                    velocityX: asteroid.velocityX + (Math.random() - 0.5) * 3,
-                                    velocityY: asteroid.velocityY + (Math.random() - 0.5) * 3,
-                                    rotation: Math.random() * Math.PI * 2,
-                                    rotationSpeed: (Math.random() - 0.5) * 0.04,
-                                    size: asteroid.size * 0.5,
-                                    vertices: Math.floor(4 + Math.random() * 2),
-                                    type: 'small'
-                                });
+                                const spd = 1.8 + Math.random() * 1.5;
+                                const ang = Math.random() * Math.PI * 2;
+                                asteroids.push(makeAsteroid(asteroid.x, asteroid.y,
+                                    asteroid.velocityX + Math.cos(ang) * spd,
+                                    asteroid.velocityY + Math.sin(ang) * spd,
+                                    asteroid.size * 0.5, 'small'));
                             }
                         }
                         
@@ -453,6 +529,45 @@
                 }
             }
             
+            // Player bullet vs saucer
+            if (saucer) {
+                for (let i = bullets.length - 1; i >= 0; i--) {
+                    const dx = bullets[i].x - saucer.x, dy = bullets[i].y - saucer.y;
+                    if (Math.sqrt(dx*dx + dy*dy) < saucer.size + 4) {
+                        score += saucer.points;
+                        updateDisplay();
+                        for (let k = 0; k < 20; k++) {
+                            const a = Math.random() * Math.PI * 2, spd = 1 + Math.random() * 3;
+                            createParticle(saucer.x, saucer.y, Math.cos(a)*spd, Math.sin(a)*spd, '#ff4400', 2+Math.random()*2, 30+Math.random()*20);
+                        }
+                        bullets.splice(i, 1);
+                        saucer = null; saucerBullets = [];
+                        break;
+                    }
+                }
+            }
+
+            // Saucer bullet vs player
+            if (!player.invincible && saucerBullets.length > 0) {
+                for (let i = saucerBullets.length - 1; i >= 0; i--) {
+                    const dx = saucerBullets[i].x - player.x, dy = saucerBullets[i].y - player.y;
+                    if (Math.sqrt(dx*dx + dy*dy) < player.radius + 4) {
+                        saucerBullets.splice(i, 1);
+                        lives--;
+                        updateDisplay();
+                        for (let j = 0; j < 30; j++) {
+                            const a = Math.random() * Math.PI * 2, spd = 1 + Math.random() * 3;
+                            createParticle(player.x, player.y, Math.cos(a)*spd, Math.sin(a)*spd, '#ff0055', 3+Math.random()*4, 40+Math.random()*40);
+                        }
+                        player.x = canvas.width/2; player.y = canvas.height/2;
+                        player.velocityX = 0; player.velocityY = 0;
+                        player.invincible = true; player.invincibleTimer = 150;
+                        if (lives <= 0) { gameOver = true; gameRunning = false; gameOverElement.style.display = 'block'; }
+                        break;
+                    }
+                }
+            }
+
             // Player vs asteroid collisions
             if (!player.invincible) {
                 for (let i = asteroids.length - 1; i >= 0; i--) {
@@ -521,6 +636,9 @@
             // Draw asteroids
             drawAsteroids();
             
+            // Draw saucer
+            drawSaucer();
+
             // Draw particles
             drawParticles();
         }
@@ -605,21 +723,17 @@
                 ctx.shadowColor = asteroid.type === 'large' ? '#666666' : 
                                  asteroid.type === 'medium' ? '#888888' : '#aaaaaa';
                 
-                // Draw irregular polygon
+                // Draw pre-computed irregular polygon (stable shape each frame)
                 ctx.beginPath();
-                for (let i = 0; i < asteroid.vertices; i++) {
-                    const angle = (i / asteroid.vertices) * Math.PI * 2;
-                    const radius = asteroid.size * (0.7 + Math.random() * 0.3);
-                    const x = Math.cos(angle) * radius;
-                    const y = Math.sin(angle) * radius;
-                    
-                    if (i === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
+                for (let i = 0; i < asteroid.verts.length; i++) {
+                    const v = asteroid.verts[i];
+                    const x = v.cos * asteroid.size;
+                    const y = v.sin * asteroid.size;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
                 }
                 ctx.closePath();
+                ctx.stroke(); // Original asteroids used wireframe (vector display)
                 ctx.fill();
                 
                 ctx.restore();
@@ -641,6 +755,41 @@
             ctx.shadowBlur = 0;
         }
         
+        // Draw flying saucer
+        function drawSaucer() {
+            if (!saucer) return;
+            const { x, y, size } = saucer;
+            ctx.strokeStyle = '#ff4400';
+            ctx.fillStyle = '#331100';
+            ctx.shadowColor = '#ff4400';
+            ctx.shadowBlur = 12;
+            ctx.lineWidth = 2;
+
+            // Classic saucer: three ellipses stacked
+            ctx.beginPath();
+            ctx.ellipse(x, y + size * 0.1, size, size * 0.38, 0, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
+            ctx.beginPath();
+            ctx.ellipse(x, y - size * 0.1, size * 0.65, size * 0.55, 0, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
+            ctx.beginPath();
+            ctx.ellipse(x, y - size * 0.3, size * 0.28, size * 0.28, 0, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
+
+            ctx.shadowBlur = 0; ctx.lineWidth = 1;
+
+            // Saucer bullets
+            ctx.fillStyle = '#ff8800';
+            ctx.shadowColor = '#ff8800';
+            ctx.shadowBlur = 6;
+            for (const b of saucerBullets) {
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.shadowBlur = 0;
+        }
+
         // Shoot bullet
         function shoot() {
             if (!gameRunning) return;
